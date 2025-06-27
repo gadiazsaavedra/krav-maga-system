@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Sistema de gestión para clubes de Krav Maga",
   "scripts": {
-    "build": "cd client && npm run build",
-    "dev": "cd client && npm start"
+    "build": "npm run build --prefix client",
+    "start": "npm start --prefix client"
   },
   "dependencies": {
     "express": "^4.18.2",
