@@ -90,12 +90,12 @@ const IndumentariaTab: React.FC = () => {
   };
 
   const fetchAlumnos = async () => {
-    try {
-      const response = await axios.get('http://localhost:5002/api/alumnos');
-      setAlumnos(response.data.data || response.data);
-    } catch (error) {
-      console.error('Error fetching alumnos:', error);
-    }
+    // Demo: usar datos mock
+    setAlumnos([
+      { id: 1, nombre: 'Juan', apellido: 'Pérez' },
+      { id: 2, nombre: 'María', apellido: 'González' },
+      { id: 3, nombre: 'Carlos', apellido: 'Rodríguez' }
+    ]);
   };
 
   const fetchProductos = async () => {
@@ -112,16 +112,9 @@ const IndumentariaTab: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    try {
-      await axios.post('http://localhost:5002/api/pedidos-indumentaria', {
-        ...formData,
-        monto: parseFloat(formData.monto)
-      });
-      fetchPedidos();
-      handleClose();
-    } catch (error) {
-      console.error('Error creating pedido:', error);
-    }
+    // Demo: Solo mostrar mensaje de éxito
+    alert('✅ Pedido creado exitosamente (DEMO)');
+    handleClose();
   };
 
   const handleClose = () => {

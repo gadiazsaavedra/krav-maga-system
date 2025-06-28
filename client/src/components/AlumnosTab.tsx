@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import AlumnoTableRow from './AlumnoTableRow';
 import LoadingSpinner from './LoadingSpinner';
+import DemoMessage from './DemoMessage';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { alumnoSchema } from '../utils/validationSchemas';
 import { useAlumnos, useCreateAlumno, useUpdateAlumno, useDeleteAlumno } from '../hooks/useAlumnos';
@@ -120,44 +121,13 @@ const AlumnosTab: React.FC = () => {
       return;
     }
     
-    try {
-      if (editingAlumno) {
-        await updateAlumnoMutation.mutateAsync({ id: editingAlumno.id, ...formData });
-        handleClose();
-        alert('Alumno actualizado exitosamente');
-      } else {
-        try {
-          await createAlumnoMutation.mutateAsync(formData);
-          handleClose();
-          alert('Alumno creado exitosamente');
-        } catch (error: any) {
-          if (error.response && error.response.status === 409) {
-            const duplicadoId = error.response.data.alumnoExistente;
-            const esInactivo = error.response.data.alumnoInactivo;
-            
-            let mensaje = `Ya existe un alumno ${esInactivo ? 'inactivo' : 'activo'} con el nombre ${formData.nombre} ${formData.apellido}.\n\n`;
-            
-            if (esInactivo) {
-              mensaje += 'Puede reactivar el alumno existente o crear uno nuevo con otro nombre.';
-            }
-            
-            const confirmar = window.confirm(mensaje + '\n\n¿Desea ver los detalles del alumno existente?');
-            
-            if (confirmar) {
-              const alumnoExistente = alumnos.find((a: any) => a.id === duplicadoId);
-              if (alumnoExistente) {
-                handleEdit(alumnoExistente);
-              }
-            }
-          } else {
-            throw error;
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error al guardar alumno:', error);
-      alert('Error al guardar los datos. Intente nuevamente.');
+    // Demo: Solo mostrar mensaje de éxito
+    if (editingAlumno) {
+      alert('✅ Alumno actualizado exitosamente (DEMO)');
+    } else {
+      alert('✅ Alumno creado exitosamente (DEMO)');
     }
+    handleClose();
   };
 
   const handleClose = () => {
@@ -219,6 +189,7 @@ const AlumnosTab: React.FC = () => {
 
   return (
     <Box>
+      <DemoMessage />
       <Box sx={{ 
         display: 'flex', 
         flexDirection: { xs: 'column', sm: 'row' },
