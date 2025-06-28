@@ -10,6 +10,7 @@ import LoadingSpinner from './LoadingSpinner';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { alumnoSchema } from '../utils/validationSchemas';
 import { useAlumnos, useCreateAlumno, useUpdateAlumno, useDeleteAlumno } from '../hooks/useAlumnos';
+import { mockAlumnos } from '../data/mockData';
 import { Add, Edit } from '@mui/icons-material';
 
 // Datos estáticos para demostración
@@ -56,7 +57,11 @@ const AlumnosTab: React.FC = () => {
   const [orderBy, setOrderBy] = useState<OrderBy>('apellido');
   
   // React Query hooks
-  const { data: alumnosData, isLoading, error } = useAlumnos(page, rowsPerPage, orderBy, order);
+  // Usar datos mock para demo
+  const alumnosData = { data: mockAlumnos, total: mockAlumnos.length };
+  const isLoading = false;
+  const error = null;
+  // const { data: alumnosData, isLoading, error } = useAlumnos(page, rowsPerPage, orderBy, order);
   const createAlumnoMutation = useCreateAlumno();
   const updateAlumnoMutation = useUpdateAlumno();
   const deleteAlumnoMutation = useDeleteAlumno();

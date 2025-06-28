@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AlumnoTableRow from './AlumnoTableRow';
 import LoadingSpinner from './LoadingSpinner';
 import { useProductos, useStockBajo, useCreateProducto, useUpdateProducto } from '../hooks/useProductos';
+import { mockProductos } from '../data/mockData';
 import {
   Box, Typography, Button, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, Select, MenuItem, FormControl, InputLabel,
@@ -46,9 +47,12 @@ const IndumentariaTab: React.FC = () => {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [open, setOpen] = useState(false);
   
-  // React Query hooks
-  const { data: productos = [], isLoading: productosLoading } = useProductos();
-  const { data: stockBajo = [] } = useStockBajo();
+  // Usar datos mock para demo
+  const productos = mockProductos;
+  const stockBajo = mockProductos.filter(p => p.stock <= p.stock_minimo);
+  const productosLoading = false;
+  // const { data: productos = [], isLoading: productosLoading } = useProductos();
+  // const { data: stockBajo = [] } = useStockBajo();
   const createProductoMutation = useCreateProducto();
   const updateProductoMutation = useUpdateProducto();
   
