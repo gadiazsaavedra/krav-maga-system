@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline, AppBar, Toolbar, Typography, Container, Tabs, Tab, Box } from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import 'dayjs/locale/es';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+// import 'dayjs/locale/es';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AppProvider } from './context/AppContext';
@@ -108,7 +108,6 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AppProvider>
         <ThemeProvider theme={theme}>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
             <CssBaseline />
         <AppBar position="static" sx={{ bgcolor: 'primary.main' }}>
           <Toolbar sx={{ minHeight: { xs: 56, sm: 64 } }}>
@@ -187,7 +186,6 @@ function App() {
             </Suspense>
           </TabPanel>
         </Container>
-          </LocalizationProvider>
         </ThemeProvider>
       </AppProvider>
       {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
