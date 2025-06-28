@@ -1,0 +1,24 @@
+{
+  "name": "krav-maga-system-aws",
+  "version": "1.0.0",
+  "description": "Sistema de gestión Krav Maga para AWS",
+  "main": "server/app-aws.js",
+  "scripts": {
+    "start": "node server/app-aws.js",
+    "build": "cd client && npm install && npm run build",
+    "dev": "nodemon server/app-aws.js",
+    "aws-deploy": "npm run build && npm start"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "compression": "^1.7.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
