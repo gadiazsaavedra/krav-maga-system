@@ -248,7 +248,7 @@ const AlumnosTab: React.FC = () => {
       
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          Error al cargar los alumnos: {error.message}
+          Error al cargar los alumnos: {(error as any)?.message || 'Error desconocido'}
         </Alert>
       )}
       
