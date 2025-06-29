@@ -3,7 +3,7 @@ import {
   Box, Button, Dialog, DialogTitle, DialogContent, DialogActions,
   TextField, Grid, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, IconButton, Chip, Typography, TableSortLabel,
-  TablePagination, Alert
+  TablePagination, Alert, MenuItem
 } from '@mui/material';
 import AlumnoTableRow from './AlumnoTableRow';
 import LoadingSpinner from './LoadingSpinner';
@@ -472,12 +472,11 @@ const AlumnosTab: React.FC = () => {
                 label="Turno"
                 value={formData.grupo}
                 onChange={(e) => setValue('grupo', e.target.value)}
-                SelectProps={{ native: true }}
               >
                 {turnosDisponibles.map((turno) => (
-                  <option key={turno} value={turno}>
+                  <MenuItem key={turno} value={turno}>
                     {turno}
-                  </option>
+                  </MenuItem>
                 ))}
               </TextField>
             </Grid>
@@ -494,12 +493,11 @@ const AlumnosTab: React.FC = () => {
                   setValue('cinturon', nuevoCinturon);
                   setValue('grupo', turnosParaCinturon.length > 0 ? turnosParaCinturon[0] : '');
                 }}
-                SelectProps={{ native: true }}
               >
                 {cinturones.map((cinturon) => (
-                  <option key={cinturon} value={cinturon}>
+                  <MenuItem key={cinturon} value={cinturon}>
                     {cinturon}
-                  </option>
+                  </MenuItem>
                 ))}
               </TextField>
             </Grid>
