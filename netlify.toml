@@ -1,7 +1,12 @@
 [build]
-  command = "cd client && npm install && CI=false npm run build"
+  base = "client"
   publish = "client/build"
+  command = "npm run build"
 
 [build.environment]
-  NODE_VERSION = "18"
-  CI = "false"
+  REACT_APP_API_URL = "http://13.221.210.59:3000"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
