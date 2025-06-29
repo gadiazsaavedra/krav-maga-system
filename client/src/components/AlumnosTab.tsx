@@ -58,9 +58,9 @@ const AlumnosTab: React.FC = () => {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<OrderBy>('apellido');
   
-  // React Query hooks
-  // Usar datos mock para demo
-  const alumnosData = { data: mockAlumnos, total: mockAlumnos.length };
+  // Estado local para alumnos
+  const [alumnosLocal, setAlumnosLocal] = useState(mockAlumnos);
+  const alumnosData = { data: alumnosLocal, total: alumnosLocal.length };
   const isLoading = false;
   const error = null;
   // const { data: alumnosData, isLoading, error } = useAlumnos(page, rowsPerPage, orderBy, order);
@@ -168,34 +168,36 @@ const AlumnosTab: React.FC = () => {
         activo: editingAlumno.activo || 1
       };
       
-      // Actualizar en mockAlumnos
-      const index = mockAlumnos.findIndex(a => a.id === editingAlumno.id);
-      if (index !== -1) {
-        mockAlumnos[index] = alumnoActualizado as any;
-      }
+      // Actualizar en estado local
+      setAlumnosLocal(prevAlumnos => {
+        const index = prevAlumnos.findIndex(a => a.id === editingAlumno.id);
+        if (index !== -1) {
+          const nuevosAlumnos = [...prevAlumnos];
+          nuevosAlumnos[index] = alumnoActualizado as any;
+          return nuevosAlumnos;
+        }
+        return prevAlumnos;
+      });
       
       alert('✅ Alumno actualizado exitosamente');
     } else {
       // Crear nuevo alumno
       const nuevoAlumno = {
-        id: Math.max(...mockAlumnos.map(a => a.id)) + 1,
+        id: Math.max(...alumnosLocal.map(a => a.id)) + 1,
         ...formData,
         fecha_registro: new Date().toISOString().split('T')[0],
         activo: 1,
         inasistencias_recientes: 0
       };
       
-      // Agregar a mockAlumnos
-      mockAlumnos.push(nuevoAlumno as any);
+      // Agregar a estado local
+      setAlumnosLocal(prevAlumnos => [...prevAlumnos, nuevoAlumno as any]);
       
       alert('✅ Alumno creado exitosamente');
     }
     
     handleClose();
-    // Forzar re-render para mostrar cambios inmediatamente
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
+    // Ya no necesitamos reload porque usamos estado local
   };
 
   const handleClose = () => {
