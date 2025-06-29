@@ -10,17 +10,17 @@ import LoadingSpinner from './LoadingSpinner';
 import DemoMessage from './DemoMessage';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { alumnoSchema } from '../utils/validationSchemas';
-import { useAlumnos, useCreateAlumno, useUpdateAlumno, useDeleteAlumno } from '../hooks/useAlumnos';
+import { useCreateAlumno, useUpdateAlumno, useDeleteAlumno } from '../hooks/useAlumnos';
 import { mockAlumnos } from '../data/mockData';
 import { Add, Edit } from '@mui/icons-material';
 
 // Datos estáticos para demostración
-const alumnosIniciales = [
+// const alumnosIniciales = [
   { id: 1, nombre: 'Juan', apellido: 'Pérez', telefono: '11-1234-5678', email: 'juan@example.com', fecha_nacimiento: '1990-05-15', grupo: 'Adultos', cinturon: 'Amarillo', fecha_registro: '2024-01-15' },
   { id: 2, nombre: 'María', apellido: 'González', telefono: '11-2345-6789', email: 'maria@example.com', fecha_nacimiento: '1985-08-22', grupo: 'Adultos', cinturon: 'Verde', fecha_registro: '2024-02-10' },
   { id: 3, nombre: 'Carlos', apellido: 'Rodríguez', telefono: '11-3456-7890', email: 'carlos@example.com', fecha_nacimiento: '1992-03-10', grupo: 'Jóvenes', cinturon: 'Blanco', fecha_registro: '2024-03-05' },
-  { id: 4, nombre: 'Ana', apellido: 'Martínez', telefono: '11-4567-8901', email: 'ana@example.com', fecha_nacimiento: '1988-12-05', grupo: 'Adultos', cinturon: 'Azul', fecha_registro: '2024-01-20' }
-];
+  // { id: 4, nombre: 'Ana', apellido: 'Martínez', telefono: '11-4567-8901', email: 'ana@example.com', fecha_nacimiento: '1988-12-05', grupo: 'Adultos', cinturon: 'Azul', fecha_registro: '2024-01-20' }
+// ];
 
 interface Alumno {
   id: number;
@@ -63,9 +63,9 @@ const AlumnosTab: React.FC = () => {
   const isLoading = false;
   const error = null;
   // const { data: alumnosData, isLoading, error } = useAlumnos(page, rowsPerPage, orderBy, order);
-  const createAlumnoMutation = useCreateAlumno();
+  // const createAlumnoMutation = useCreateAlumno();
   const updateAlumnoMutation = useUpdateAlumno();
-  const deleteAlumnoMutation = useDeleteAlumno();
+  // const deleteAlumnoMutation = useDeleteAlumno();
   const [editingAlumno, setEditingAlumno] = useState<Alumno | null>(null);
   const initialFormData = {
     nombre: '',
@@ -80,7 +80,7 @@ const AlumnosTab: React.FC = () => {
   const {
     values: formData,
     errors,
-    isValid,
+    // isValid,
     setValue,
     setAllValues,
     validateAll,

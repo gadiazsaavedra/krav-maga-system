@@ -20,7 +20,7 @@ const RenovacionesTab: React.FC = () => {
 
   useEffect(() => {
     fetchRenovaciones();
-  }, [selectedAño]);
+  }, [selectedAño, fetchRenovaciones]);
 
   const fetchRenovaciones = async () => {
     try {

@@ -82,8 +82,8 @@ const IndumentariaTab: React.FC = () => {
   }, []);
   
   // Funciones dummy para compatibilidad
-  const setProductos = () => {};
-  const setStockBajo = () => {};
+  // const setProductos = () => {};
+  // const setStockBajo = () => {};
 
   const fetchStockBajo = async () => {
     // Ya no se usa, React Query maneja esto

@@ -52,7 +52,7 @@ const AsistenciasTab: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [diaActual] = useState(obtenerDiaActual());
+  // const [diaActual] = useState(obtenerDiaActual());
 
   // Cargar turnos
   useEffect(() => {

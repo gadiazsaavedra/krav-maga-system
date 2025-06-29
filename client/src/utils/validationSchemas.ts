@@ -13,7 +13,7 @@ export const alumnoSchema = yup.object({
     .max(50, 'El apellido no puede exceder 50 caracteres'),
   telefono: yup
     .string()
-    .matches(/^[\d\s\-\+\(\)]+$/, 'Formato de teléfono inválido')
+    .matches(/^[\d\s\-+()]+$/, 'Formato de teléfono inválido')
     .min(8, 'El teléfono debe tener al menos 8 dígitos'),
   email: yup
     .string()

@@ -68,7 +68,7 @@ const MensualidadesTab: React.FC = () => {
   }, [estadoPagos]);
 
   const pagados = estadoPagos.filter(p => p.estado === 'Pagado').length;
-  const pendientes = estadoPagos.filter(p => p.estado === 'Pendiente').length;
+  // const pendientes = estadoPagos.filter(p => p.estado === 'Pendiente').length;
   const morosos = estadoPagos.filter(p => p.estado === 'Pendiente' && p.dias_atraso > 0).length;
   const inactivos = estadoPagos.filter(p => p.estado === 'Pendiente' && p.dias_atraso > 90).length;
   const totalRecaudado = estadoPagos
