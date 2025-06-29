@@ -190,8 +190,10 @@ const AlumnosTab: React.FC = () => {
     }
     
     handleClose();
-    // Forzar re-render
-    window.location.reload();
+    // Forzar re-render para mostrar cambios inmediatamente
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   const handleClose = () => {
