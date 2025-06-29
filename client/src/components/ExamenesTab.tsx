@@ -49,37 +49,115 @@ const ExamenesTab: React.FC = () => {
   }, []);
 
   const fetchAlumnos = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/api/alumnos`);
-      setAlumnos(response.data.data || response.data || []);
-    } catch (error) {
-      console.error('Error fetching alumnos:', error);
-      setAlumnos([]);
-    }
+    // Demo: Usar datos mock de alumnos
+    const alumnosMock = [
+      { id: 1, nombre: 'Juan', apellido: 'Pérez', cinturon: 'Amarillo' },
+      { id: 2, nombre: 'María', apellido: 'González', cinturon: 'Verde' },
+      { id: 3, nombre: 'Carlos', apellido: 'Rodríguez', cinturon: 'Blanco' },
+      { id: 4, nombre: 'Ana', apellido: 'López', cinturon: 'Azul' },
+      { id: 5, nombre: 'Pedro', apellido: 'Martín', cinturon: 'Naranja' }
+    ];
+    
+    setAlumnos(alumnosMock);
   };
 
   const fetchExamenes = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/api/examenes`);
-      setExamenes(response.data);
-    } catch (error) {
-      console.error('Error fetching examenes:', error);
-    }
+    // Demo: Usar datos mock de exámenes
+    const examenesMock = [
+      {
+        id: 1,
+        nombre: 'Juan',
+        apellido: 'Pérez',
+        cinturon_actual: 'Amarillo',
+        cinturon_objetivo: 'Naranja',
+        fecha_examen: '2024-12-20',
+        aprobado: true,
+        pagado: true,
+        monto: 15000,
+        fecha_pago: '2024-12-18'
+      },
+      {
+        id: 2,
+        nombre: 'María',
+        apellido: 'González',
+        cinturon_actual: 'Verde',
+        cinturon_objetivo: 'Azul',
+        fecha_examen: '2024-12-22',
+        aprobado: true,
+        pagado: false,
+        monto: 20000,
+        fecha_pago: null
+      },
+      {
+        id: 3,
+        nombre: 'Carlos',
+        apellido: 'Rodríguez',
+        cinturon_actual: 'Blanco',
+        cinturon_objetivo: 'Amarillo',
+        fecha_examen: '2024-12-25',
+        aprobado: false,
+        pagado: false,
+        monto: 12000,
+        fecha_pago: null
+      },
+      {
+        id: 4,
+        nombre: 'Ana',
+        apellido: 'López',
+        cinturon_actual: 'Azul',
+        cinturon_objetivo: 'Marrón',
+        fecha_examen: '2024-12-28',
+        aprobado: false,
+        pagado: true,
+        monto: 25000,
+        fecha_pago: '2024-12-15'
+      },
+      {
+        id: 5,
+        nombre: 'Pedro',
+        apellido: 'Martín',
+        cinturon_actual: 'Naranja',
+        cinturon_objetivo: 'Verde',
+        fecha_examen: '2024-12-30',
+        aprobado: true,
+        pagado: false,
+        monto: 18000,
+        fecha_pago: null
+      }
+    ];
+    
+    setExamenes(examenesMock);
   };
 
   const handleSubmit = async () => {
-    try {
-      const alumno = Array.isArray(alumnos) ? alumnos.find(a => a.id === Number(formData.alumno_id)) : null;
-      await axios.post(`${API_BASE_URL}/api/examenes`, {
-        ...formData,
-        cinturon_actual: alumno?.cinturon,
-        monto: parseFloat(formData.monto)
-      });
-      fetchExamenes();
-      handleClose();
-    } catch (error) {
-      console.error('Error creating examen:', error);
+    if (!formData.alumno_id || !formData.cinturon_objetivo || !formData.fecha_examen || !formData.monto) {
+      alert('Por favor completa todos los campos');
+      return;
     }
+    
+    const alumno = Array.isArray(alumnos) ? alumnos.find(a => a.id === Number(formData.alumno_id)) : null;
+    
+    if (!alumno) {
+      alert('Alumno no encontrado');
+      return;
+    }
+    
+    const nuevoExamen = {
+      id: Math.max(...examenes.map(e => e.id)) + 1,
+      nombre: alumno.nombre,
+      apellido: alumno.apellido,
+      cinturon_actual: alumno.cinturon,
+      cinturon_objetivo: formData.cinturon_objetivo,
+      fecha_examen: formData.fecha_examen,
+      aprobado: false,
+      pagado: false,
+      monto: parseFloat(formData.monto),
+      fecha_pago: null
+    };
+    
+    setExamenes([...examenes, nuevoExamen]);
+    alert('✅ Examen creado exitosamente');
+    handleClose();
   };
 
   const handleClose = () => {
@@ -93,31 +171,29 @@ const ExamenesTab: React.FC = () => {
   };
 
   const handleAprobar = async (examenId: number, aprobado: boolean, cinturonObjetivo: string) => {
-    try {
-      await axios.put(`http://localhost:5002/api/examenes/${examenId}/aprobar`, {
-        aprobado,
-        pagado: false,
-        cinturon_objetivo: cinturonObjetivo
-      });
-      fetchExamenes();
-      fetchAlumnos(); // Actualizar cinturones de alumnos
-    } catch (error) {
-      console.error('Error updating examen:', error);
-    }
+    // Actualizar localmente
+    setExamenes(prevExamenes => 
+      prevExamenes.map(examen => 
+        examen.id === examenId 
+          ? { ...examen, aprobado }
+          : examen
+      )
+    );
   };
 
   const handlePago = async (examenId: number, pagado: boolean) => {
-    try {
-      const examen = examenes.find(e => e.id === examenId);
-      await axios.put(`http://localhost:5002/api/examenes/${examenId}/aprobar`, {
-        aprobado: examen?.aprobado || false,
-        pagado,
-        cinturon_objetivo: examen?.cinturon_objetivo
-      });
-      fetchExamenes();
-    } catch (error) {
-      console.error('Error updating pago:', error);
-    }
+    // Actualizar localmente
+    setExamenes(prevExamenes => 
+      prevExamenes.map(examen => 
+        examen.id === examenId 
+          ? { 
+              ...examen, 
+              pagado,
+              fecha_pago: pagado ? new Date().toISOString().split('T')[0] : null
+            }
+          : examen
+      )
+    );
   };
 
   const getCinturonColor = (cinturon: string) => {
