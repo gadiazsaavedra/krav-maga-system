@@ -226,7 +226,7 @@ const AlumnosTab: React.FC = () => {
 
   return (
     <Box>
-      <DemoMessage />
+      {/* <DemoMessage /> */}
       <Box sx={{ 
         display: 'flex', 
         flexDirection: { xs: 'column', sm: 'row' },
