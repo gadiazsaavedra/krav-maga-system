@@ -316,11 +316,13 @@ const AlumnosTab: React.FC = () => {
           minWidth: { xs: 600, sm: 'auto' }
         },
         '& .MuiTableHead-root': {
-          backgroundColor: 'primary.main',
+          backgroundColor: 'primary.dark',
           '& .MuiTableCell-head': {
             color: 'white',
-            fontWeight: 600,
-            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+            fontWeight: 700,
+            fontSize: { xs: '0.8rem', sm: '0.9rem' },
+            textShadow: '1px 1px 2px rgba(0,0,0,0.3)',
+            letterSpacing: '0.5px'
           }
         },
         '& .MuiTableRow-root:nth-of-type(even)': {
