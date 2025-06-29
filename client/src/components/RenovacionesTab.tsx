@@ -141,10 +141,22 @@ const RenovacionesTab: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" component="h2">
-          <Refresh sx={{ mr: 1, verticalAlign: 'middle' }} />
-          Renovaciones Anuales
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between', 
+        alignItems: { xs: 'stretch', sm: 'center' }, 
+        mb: 3,
+        gap: 2,
+        p: { xs: 2, sm: 0 }
+      }}>
+        <Typography variant="h4" component="h1" sx={{ 
+          fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+          fontWeight: 600,
+          color: 'primary.main',
+          mb: { xs: 1, sm: 0 }
+        }}>
+          🔄 Renovaciones Anuales
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <TextField
@@ -193,7 +205,26 @@ const RenovacionesTab: React.FC = () => {
         </Grid>
       </Grid>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ 
+        overflowX: 'auto',
+        borderRadius: 3,
+        boxShadow: 3,
+        '& .MuiTableHead-root': {
+          backgroundColor: 'primary.main',
+          '& .MuiTableCell-head': {
+            color: 'white',
+            fontWeight: 600,
+            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+          }
+        },
+        '& .MuiTableRow-root:nth-of-type(even)': {
+          backgroundColor: 'grey.50'
+        },
+        '& .MuiTableRow-root:hover': {
+          backgroundColor: 'primary.light',
+          cursor: 'pointer'
+        }
+      }}>
         <Table>
           <TableHead>
             <AlumnoTableRow isHeader>
