@@ -103,17 +103,114 @@ const IndumentariaTab: React.FC = () => {
   };
 
   const fetchPedidos = async () => {
-    try {
-      const response = await axios.get('http://localhost:5002/api/pedidos-indumentaria');
-      setPedidos(response.data);
-    } catch (error) {
-      console.error('Error fetching pedidos:', error);
-    }
+    // Demo: Usar datos mock de pedidos
+    const pedidosMock = [
+      {
+        id: 1,
+        nombre: 'Juan',
+        apellido: 'Pérez',
+        tipo: 'Remera',
+        talle: 'M',
+        precio: 2500,
+        cantidad: 2,
+        estado: 'Pedido',
+        fecha_pedido: '2024-12-15',
+        fecha_entrega: '',
+        monto: 5000,
+        pagado: false
+      },
+      {
+        id: 2,
+        nombre: 'María',
+        apellido: 'González',
+        tipo: 'Short',
+        talle: 'L',
+        precio: 3000,
+        cantidad: 1,
+        estado: 'Recibido en Club',
+        fecha_pedido: '2024-12-10',
+        fecha_entrega: '',
+        monto: 3000,
+        pagado: true
+      },
+      {
+        id: 3,
+        nombre: 'Carlos',
+        apellido: 'Rodríguez',
+        tipo: 'Guantes',
+        talle: 'Único',
+        precio: 4500,
+        cantidad: 1,
+        estado: 'Entregado',
+        fecha_pedido: '2024-12-05',
+        fecha_entrega: '2024-12-20',
+        monto: 4500,
+        pagado: true
+      },
+      {
+        id: 4,
+        nombre: 'Ana',
+        apellido: 'López',
+        tipo: 'Remera',
+        talle: 'S',
+        precio: 2500,
+        cantidad: 1,
+        estado: 'Pedido',
+        fecha_pedido: '2024-12-18',
+        fecha_entrega: '',
+        monto: 2500,
+        pagado: false
+      },
+      {
+        id: 5,
+        nombre: 'Pedro',
+        apellido: 'Martín',
+        tipo: 'Short',
+        talle: 'M',
+        precio: 3000,
+        cantidad: 2,
+        estado: 'Recibido en Club',
+        fecha_pedido: '2024-12-12',
+        fecha_entrega: '',
+        monto: 6000,
+        pagado: true
+      }
+    ];
+    
+    setPedidos(pedidosMock);
   };
 
   const handleSubmit = async () => {
-    // Demo: Solo mostrar mensaje de éxito
-    alert('✅ Pedido creado exitosamente (DEMO)');
+    if (!formData.alumno_id || !formData.producto_id) {
+      alert('Por favor completa todos los campos');
+      return;
+    }
+    
+    const alumnoSeleccionado = alumnos.find(a => a.id === Number(formData.alumno_id));
+    const productoSeleccionado = productos.find(p => p.id === Number(formData.producto_id));
+    
+    if (!alumnoSeleccionado || !productoSeleccionado) {
+      alert('Error: Alumno o producto no encontrado');
+      return;
+    }
+    
+    const nuevoPedido = {
+      id: Math.max(...pedidos.map(p => p.id)) + 1,
+      nombre: alumnoSeleccionado.nombre,
+      apellido: alumnoSeleccionado.apellido,
+      tipo: productoSeleccionado.tipo,
+      talle: productoSeleccionado.talle,
+      precio: productoSeleccionado.precio,
+      cantidad: formData.cantidad,
+      estado: 'Pedido',
+      fecha_pedido: new Date().toISOString().split('T')[0],
+      fecha_entrega: '',
+      monto: Number(formData.monto),
+      pagado: false
+    };
+    
+    setPedidos([...pedidos, nuevoPedido]);
+    alert('✅ Pedido creado exitosamente');
     handleClose();
   };
 
@@ -128,14 +225,14 @@ const IndumentariaTab: React.FC = () => {
   };
 
   const handleEstadoChange = async (pedidoId: number, nuevoEstado: string) => {
-    try {
-      await axios.put(`http://localhost:5002/api/pedidos-indumentaria/${pedidoId}/estado`, {
-        estado: nuevoEstado
-      });
-      fetchPedidos();
-    } catch (error) {
-      console.error('Error updating estado:', error);
-    }
+    // Actualizar estado localmente
+    setPedidos(prevPedidos => 
+      prevPedidos.map(pedido => 
+        pedido.id === pedidoId 
+          ? { ...pedido, estado: nuevoEstado, fecha_entrega: nuevoEstado === 'Entregado' ? new Date().toISOString().split('T')[0] : pedido.fecha_entrega }
+          : pedido
+      )
+    );
   };
 
   const handlePrecioChange = async (productoId: number, nuevoPrecio: number) => {
