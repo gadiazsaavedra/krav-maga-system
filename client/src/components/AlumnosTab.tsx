@@ -158,13 +158,40 @@ const AlumnosTab: React.FC = () => {
       return;
     }
     
-    // Demo: Solo mostrar mensaje de éxito
     if (editingAlumno) {
-      alert('✅ Alumno actualizado exitosamente (DEMO)');
+      // Actualizar alumno existente
+      const alumnoActualizado = {
+        ...editingAlumno,
+        ...formData,
+        fecha_registro: editingAlumno.fecha_registro || new Date().toISOString().split('T')[0]
+      };
+      
+      // Actualizar en mockAlumnos
+      const index = mockAlumnos.findIndex(a => a.id === editingAlumno.id);
+      if (index !== -1) {
+        mockAlumnos[index] = alumnoActualizado;
+      }
+      
+      alert('✅ Alumno actualizado exitosamente');
     } else {
-      alert('✅ Alumno creado exitosamente (DEMO)');
+      // Crear nuevo alumno
+      const nuevoAlumno = {
+        id: Math.max(...mockAlumnos.map(a => a.id)) + 1,
+        ...formData,
+        fecha_registro: new Date().toISOString().split('T')[0],
+        activo: 1,
+        inasistencias_recientes: 0
+      };
+      
+      // Agregar a mockAlumnos
+      mockAlumnos.push(nuevoAlumno);
+      
+      alert('✅ Alumno creado exitosamente');
     }
+    
     handleClose();
+    // Forzar re-render
+    window.location.reload();
   };
 
   const handleClose = () => {
