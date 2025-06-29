@@ -342,7 +342,10 @@ const AlumnosTab: React.FC = () => {
                 </TableCell>
                 <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                   <Typography variant="caption">
-                    {new Date(alumno.fecha_registro).toLocaleDateString()}
+                    {alumno.fecha_registro ? 
+                      new Date(alumno.fecha_registro).toLocaleDateString() : 
+                      new Date().toLocaleDateString()
+                    }
                   </Typography>
                 </TableCell>
                 <TableCell>
