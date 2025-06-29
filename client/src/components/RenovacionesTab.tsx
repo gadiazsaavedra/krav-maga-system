@@ -212,10 +212,10 @@ const RenovacionesTab: React.FC = () => {
         '& .MuiTableHead-root': {
           backgroundColor: 'primary.dark',
           '& .MuiTableCell-head': {
-            color: 'white',
+            color: 'black',
             fontWeight: 700,
             fontSize: { xs: '0.8rem', sm: '0.9rem' },
-            textShadow: '1px 1px 2px rgba(0,0,0,0.3)',
+            textShadow: '1px 1px 2px rgba(255,255,255,0.5)',
             letterSpacing: '0.5px'
           }
         },
