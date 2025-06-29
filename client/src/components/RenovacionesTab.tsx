@@ -18,10 +18,6 @@ const RenovacionesTab: React.FC = () => {
   const [selectedAlumno, setSelectedAlumno] = useState<any>(null);
   const [monto, setMonto] = useState('');
 
-  useEffect(() => {
-    fetchRenovaciones();
-  }, [selectedAño, fetchRenovaciones]);
-
   const fetchRenovaciones = async () => {
     try {
       console.log('Fetching renovaciones para año:', selectedAño);
@@ -32,6 +28,10 @@ const RenovacionesTab: React.FC = () => {
       console.error('Error fetching renovaciones:', error);
     }
   };
+
+  useEffect(() => {
+    fetchRenovaciones();
+  }, [selectedAño, fetchRenovaciones]);
 
   const handlePagoClick = (alumno: any) => {
     setSelectedAlumno(alumno);
