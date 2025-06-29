@@ -19,14 +19,61 @@ const RenovacionesTab: React.FC = () => {
   const [monto, setMonto] = useState('');
 
   const fetchRenovaciones = async () => {
-    try {
-      console.log('Fetching renovaciones para año:', selectedAño);
-      const response = await axios.get(`http://localhost:5002/api/renovaciones/${selectedAño}`);
-      console.log('Renovaciones recibidas:', response.data);
-      setRenovaciones(response.data);
-    } catch (error) {
-      console.error('Error fetching renovaciones:', error);
-    }
+    // Demo: Usar datos mock de renovaciones
+    const renovacionesMock = [
+      {
+        id: 1,
+        nombre: 'Juan',
+        apellido: 'Pérez',
+        pago_realizado: true,
+        formulario_entregado: true,
+        apto_fisico_entregado: true,
+        fecha_pago: '2025-01-15',
+        monto: 25000
+      },
+      {
+        id: 2,
+        nombre: 'María',
+        apellido: 'González',
+        pago_realizado: true,
+        formulario_entregado: true,
+        apto_fisico_entregado: false,
+        fecha_pago: '2025-01-10',
+        monto: 25000
+      },
+      {
+        id: 3,
+        nombre: 'Carlos',
+        apellido: 'Rodríguez',
+        pago_realizado: true,
+        formulario_entregado: false,
+        apto_fisico_entregado: false,
+        fecha_pago: '2025-01-08',
+        monto: 25000
+      },
+      {
+        id: 4,
+        nombre: 'Ana',
+        apellido: 'López',
+        pago_realizado: false,
+        formulario_entregado: false,
+        apto_fisico_entregado: false,
+        fecha_pago: null,
+        monto: null
+      },
+      {
+        id: 5,
+        nombre: 'Pedro',
+        apellido: 'Martín',
+        pago_realizado: false,
+        formulario_entregado: true,
+        apto_fisico_entregado: false,
+        fecha_pago: null,
+        monto: null
+      }
+    ];
+    
+    setRenovaciones(renovacionesMock);
   };
 
   useEffect(() => {
@@ -41,36 +88,35 @@ const RenovacionesTab: React.FC = () => {
 
   const handlePagoSubmit = async () => {
     if (selectedAlumno) {
-      try {
-        await axios.post('http://localhost:5002/api/renovaciones', {
-          alumno_id: selectedAlumno.id,
-          año: selectedAño,
-          campo: 'pago_realizado',
-          valor: 1,
-          monto: parseFloat(monto)
-        });
-        fetchRenovaciones();
-        setOpen(false);
-        setSelectedAlumno(null);
-        setMonto('');
-      } catch (error) {
-        console.error('Error registrando pago:', error);
-      }
+      // Actualizar localmente
+      setRenovaciones(prevRenovaciones => 
+        prevRenovaciones.map(renovacion => 
+          renovacion.id === selectedAlumno.id 
+            ? { 
+                ...renovacion, 
+                pago_realizado: true,
+                fecha_pago: new Date().toISOString().split('T')[0],
+                monto: parseFloat(monto)
+              }
+            : renovacion
+        )
+      );
+      
+      setOpen(false);
+      setSelectedAlumno(null);
+      setMonto('');
     }
   };
 
   const handleCheckboxChange = async (alumnoId: number, campo: string, valor: boolean) => {
-    try {
-      await axios.post('http://localhost:5002/api/renovaciones', {
-        alumno_id: alumnoId,
-        año: selectedAño,
-        campo: campo,
-        valor: valor ? 1 : 0
-      });
-      fetchRenovaciones();
-    } catch (error) {
-      console.error('Error updating renovacion:', error);
-    }
+    // Actualizar localmente
+    setRenovaciones(prevRenovaciones => 
+      prevRenovaciones.map(renovacion => 
+        renovacion.id === alumnoId 
+          ? { ...renovacion, [campo]: valor }
+          : renovacion
+      )
+    );
   };
 
   const getEstadoRenovacion = (renovacion: any) => {
