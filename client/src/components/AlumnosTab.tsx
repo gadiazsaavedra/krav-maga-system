@@ -33,6 +33,7 @@ interface Alumno {
   cinturon: string;
   fecha_registro: string;
   inasistencias_recientes?: number;
+  activo?: number;
 }
 
 type Order = 'asc' | 'desc';
