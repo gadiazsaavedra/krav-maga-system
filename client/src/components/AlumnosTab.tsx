@@ -266,11 +266,14 @@ const AlumnosTab: React.FC = () => {
         flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between', 
         alignItems: { xs: 'stretch', sm: 'center' }, 
-        mb: 2,
-        gap: 1
+        mb: 3,
+        gap: 2,
+        p: { xs: 2, sm: 0 }
       }}>
-        <Typography variant="h5" component="h2" sx={{ 
-          fontSize: { xs: '1.25rem', sm: '1.5rem' },
+        <Typography variant="h4" component="h1" sx={{ 
+          fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+          fontWeight: 600,
+          color: 'primary.main',
           mb: { xs: 1, sm: 0 }
         }}>
           🥋 Alumnos
@@ -279,9 +282,18 @@ const AlumnosTab: React.FC = () => {
           variant="contained"
           startIcon={<Add />}
           onClick={() => setOpen(true)}
+          size="large"
           sx={{ 
-            minHeight: 48,
-            fontSize: { xs: '0.875rem', sm: '1rem' }
+            minHeight: { xs: 56, sm: 48 },
+            fontSize: { xs: '1rem', sm: '1rem' },
+            borderRadius: 3,
+            textTransform: 'none',
+            fontWeight: 600,
+            boxShadow: 3,
+            '&:hover': {
+              boxShadow: 6,
+              transform: 'translateY(-1px)'
+            }
           }}
         >
           Nuevo
@@ -298,8 +310,25 @@ const AlumnosTab: React.FC = () => {
 
       <TableContainer component={Paper} sx={{ 
         overflowX: 'auto',
+        borderRadius: 3,
+        boxShadow: 3,
         '& .MuiTable-root': {
           minWidth: { xs: 600, sm: 'auto' }
+        },
+        '& .MuiTableHead-root': {
+          backgroundColor: 'primary.main',
+          '& .MuiTableCell-head': {
+            color: 'white',
+            fontWeight: 600,
+            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+          }
+        },
+        '& .MuiTableRow-root:nth-of-type(even)': {
+          backgroundColor: 'grey.50'
+        },
+        '& .MuiTableRow-root:hover': {
+          backgroundColor: 'primary.light',
+          cursor: 'pointer'
         }
       }}>
         <Table size="small">
@@ -395,7 +424,20 @@ const AlumnosTab: React.FC = () => {
                   )}
                 </TableCell>
                 <TableCell>
-                  <IconButton size="small" onClick={() => handleEdit(alumno)}>
+                  <IconButton 
+                    size="medium" 
+                    onClick={() => handleEdit(alumno)}
+                    sx={{
+                      backgroundColor: 'primary.main',
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: 'primary.dark',
+                        transform: 'scale(1.1)'
+                      },
+                      minWidth: { xs: 44, sm: 40 },
+                      minHeight: { xs: 44, sm: 40 }
+                    }}
+                  >
                     <Edit fontSize="small" />
                   </IconButton>
                 </TableCell>
@@ -422,20 +464,29 @@ const AlumnosTab: React.FC = () => {
         onClose={handleClose} 
         maxWidth="md" 
         fullWidth
+        fullScreen={{ xs: true, sm: false }}
         sx={{
           '& .MuiDialog-paper': {
             margin: { xs: 0, sm: 2 },
             maxHeight: { xs: '100vh', sm: '90vh' },
             height: { xs: '100vh', sm: 'auto' },
-            maxWidth: { xs: '100vw', sm: 'md' }
+            maxWidth: { xs: '100vw', sm: 'md' },
+            borderRadius: { xs: 0, sm: 3 }
           }
         }}
       >
-        <DialogTitle>
-          {editingAlumno ? 'Editar Alumno' : 'Nuevo Alumno'}
+        <DialogTitle sx={{
+          backgroundColor: 'primary.main',
+          color: 'white',
+          fontSize: { xs: '1.25rem', sm: '1.5rem' },
+          fontWeight: 600,
+          textAlign: 'center',
+          py: { xs: 3, sm: 2 }
+        }}>
+          {editingAlumno ? '✏️ Editar Alumno' : '➕ Nuevo Alumno'}
         </DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
+        <DialogContent sx={{ p: { xs: 3, sm: 3 } }}>
+          <Grid container spacing={{ xs: 3, sm: 2 }} sx={{ mt: 1 }}>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -557,7 +608,12 @@ const AlumnosTab: React.FC = () => {
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: editingAlumno ? 'space-between' : 'flex-end' }}>
+        <DialogActions sx={{ 
+          justifyContent: editingAlumno ? 'space-between' : 'flex-end',
+          p: { xs: 3, sm: 2 },
+          gap: 2,
+          flexDirection: { xs: 'column', sm: 'row' }
+        }}>
           {editingAlumno && (
             <Button 
               onClick={() => {
@@ -582,10 +638,36 @@ const AlumnosTab: React.FC = () => {
               Eliminar
             </Button>
           )}
-          <Box>
-            <Button onClick={handleClose} sx={{ mr: 1 }}>Cancelar</Button>
-            <Button onClick={handleSubmit} variant="contained">
-              {editingAlumno ? 'Actualizar' : 'Crear'}
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 2, 
+            width: { xs: '100%', sm: 'auto' },
+            flexDirection: { xs: 'column', sm: 'row' }
+          }}>
+            <Button 
+              onClick={handleClose} 
+              size="large"
+              sx={{ 
+                minHeight: 48,
+                textTransform: 'none',
+                fontWeight: 600
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleSubmit} 
+              variant="contained"
+              size="large"
+              sx={{
+                minHeight: 48,
+                textTransform: 'none',
+                fontWeight: 600,
+                borderRadius: 3,
+                boxShadow: 3
+              }}
+            >
+              {editingAlumno ? '✅ Actualizar' : '➕ Crear'}
             </Button>
           </Box>
         </DialogActions>
