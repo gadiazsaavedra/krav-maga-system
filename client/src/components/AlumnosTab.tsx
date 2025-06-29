@@ -164,13 +164,14 @@ const AlumnosTab: React.FC = () => {
       const alumnoActualizado = {
         ...editingAlumno,
         ...formData,
-        fecha_registro: editingAlumno.fecha_registro || new Date().toISOString().split('T')[0]
+        fecha_registro: editingAlumno.fecha_registro || new Date().toISOString().split('T')[0],
+        activo: editingAlumno.activo || 1
       };
       
       // Actualizar en mockAlumnos
       const index = mockAlumnos.findIndex(a => a.id === editingAlumno.id);
       if (index !== -1) {
-        mockAlumnos[index] = alumnoActualizado;
+        mockAlumnos[index] = alumnoActualizado as any;
       }
       
       alert('✅ Alumno actualizado exitosamente');
@@ -185,7 +186,7 @@ const AlumnosTab: React.FC = () => {
       };
       
       // Agregar a mockAlumnos
-      mockAlumnos.push(nuevoAlumno);
+      mockAlumnos.push(nuevoAlumno as any);
       
       alert('✅ Alumno creado exitosamente');
     }
