@@ -74,6 +74,7 @@ const AlumnosTab: React.FC = () => {
     telefono: '',
     email: '',
     fecha_nacimiento: '',
+    fecha_registro: '',
     grupo: 'Lunes y Miércoles 17:00-18:00',
     cinturon: 'Blanco'
   };
@@ -164,7 +165,6 @@ const AlumnosTab: React.FC = () => {
       const alumnoActualizado = {
         ...editingAlumno,
         ...formData,
-        fecha_registro: editingAlumno.fecha_registro || new Date().toISOString().split('T')[0],
         activo: editingAlumno.activo || 1
       };
       
@@ -238,6 +238,7 @@ const AlumnosTab: React.FC = () => {
       telefono: alumno.telefono || '',
       email: alumno.email || '',
       fecha_nacimiento: alumno.fecha_nacimiento || '',
+      fecha_registro: alumno.fecha_registro || '',
       grupo: turnoValido,
       cinturon: cinturon
     });
@@ -485,6 +486,26 @@ const AlumnosTab: React.FC = () => {
                 onChange={(e) => setValue('fecha_nacimiento', e.target.value)}
                 error={!!errors.fecha_nacimiento}
                 helperText={errors.fecha_nacimiento}
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    minHeight: 56,
+                    height: 56
+                  },
+                  '& .MuiInputBase-input': {
+                    height: '1.4375em',
+                    padding: '16.5px 14px'
+                  }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Fecha de Registro"
+                type="date"
+                value={formData.fecha_registro}
+                onChange={(e) => setValue('fecha_registro', e.target.value)}
                 InputLabelProps={{ shrink: true }}
                 sx={{
                   '& .MuiInputBase-root': {
