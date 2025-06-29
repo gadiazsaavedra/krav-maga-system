@@ -329,8 +329,7 @@ const AlumnosTab: React.FC = () => {
           backgroundColor: 'grey.50'
         },
         '& .MuiTableRow-root:hover': {
-          backgroundColor: 'primary.light',
-          cursor: 'pointer'
+          backgroundColor: 'grey.100'
         }
       }}>
         <Table size="small">
