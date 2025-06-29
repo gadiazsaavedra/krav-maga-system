@@ -464,7 +464,7 @@ const AlumnosTab: React.FC = () => {
         onClose={handleClose} 
         maxWidth="md" 
         fullWidth
-        fullScreen={{ xs: true, sm: false }}
+
         sx={{
           '& .MuiDialog-paper': {
             margin: { xs: 0, sm: 2 },
