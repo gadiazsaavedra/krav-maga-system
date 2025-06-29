@@ -102,8 +102,34 @@ const AlumnosTab: React.FC = () => {
     setOrder(newOrder);
     setOrderBy(property);
     setPage(0);
-
   };
+
+  // Ordenar alumnos localmente
+  const alumnosOrdenados = React.useMemo(() => {
+    if (!alumnos || alumnos.length === 0) return [];
+    
+    return [...alumnos].sort((a, b) => {
+      let aValue = '';
+      let bValue = '';
+      
+      if (orderBy === 'nombre') {
+        aValue = a.nombre || '';
+        bValue = b.nombre || '';
+      } else if (orderBy === 'apellido') {
+        aValue = a.apellido || '';
+        bValue = b.apellido || '';
+      } else if (orderBy === 'cinturon') {
+        aValue = a.cinturon || '';
+        bValue = b.cinturon || '';
+      }
+      
+      if (order === 'asc') {
+        return aValue.localeCompare(bValue);
+      } else {
+        return bValue.localeCompare(aValue);
+      }
+    });
+  }, [alumnos, order, orderBy]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -270,7 +296,7 @@ const AlumnosTab: React.FC = () => {
             </AlumnoTableRow>
           </TableHead>
           <TableBody>
-            {!isLoading && alumnos.map((alumno: any) => (
+            {!isLoading && alumnosOrdenados.map((alumno: any) => (
               <TableRow key={alumno.id}>
                 <TableCell>
                   <Box>
