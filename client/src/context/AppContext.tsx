@@ -49,10 +49,10 @@ const pagosIniciales = [
     nombre: 'Juan',
     apellido: 'Pérez',
     estado: 'Pagado',
-    fecha_pago: '2025-06-01',
-    fecha_limite: '2025-06-10',
+    fecha_pago: '2024-12-15',
+    fecha_limite: '2024-12-10',
     dias_atraso: 0,
-    monto: 15000,
+    monto: 58000,
     metodo_pago: 'Efectivo',
     activo: true
   },
@@ -61,10 +61,10 @@ const pagosIniciales = [
     nombre: 'María',
     apellido: 'González',
     estado: 'Pagado',
-    fecha_pago: '2025-06-05',
-    fecha_limite: '2025-06-10',
+    fecha_pago: '2024-12-08',
+    fecha_limite: '2024-12-10',
     dias_atraso: 0,
-    monto: 15000,
+    monto: 58000,
     metodo_pago: 'Transferencia',
     activo: true
   },
@@ -74,8 +74,8 @@ const pagosIniciales = [
     apellido: 'Rodríguez',
     estado: 'Pendiente',
     fecha_pago: null,
-    fecha_limite: '2025-06-10',
-    dias_atraso: calcularDiasAtraso('2025-06-10'),
+    fecha_limite: '2024-12-10',
+    dias_atraso: calcularDiasAtraso('2024-12-10'),
     monto: null,
     metodo_pago: null,
     activo: true
@@ -83,11 +83,11 @@ const pagosIniciales = [
   {
     id: 4,
     nombre: 'Ana',
-    apellido: 'Martínez',
+    apellido: 'López',
     estado: 'Pendiente',
     fecha_pago: null,
-    fecha_limite: '2025-05-10',
-    dias_atraso: calcularDiasAtraso('2025-05-10'),
+    fecha_limite: '2024-11-10',
+    dias_atraso: calcularDiasAtraso('2024-11-10'),
     monto: null,
     metodo_pago: null,
     activo: true
@@ -95,11 +95,11 @@ const pagosIniciales = [
   {
     id: 5,
     nombre: 'Pedro',
-    apellido: 'Sánchez',
+    apellido: 'Martín',
     estado: 'Pendiente',
     fecha_pago: null,
-    fecha_limite: '2025-03-10',
-    dias_atraso: calcularDiasAtraso('2025-03-10'),
+    fecha_limite: '2024-09-10',
+    dias_atraso: calcularDiasAtraso('2024-09-10'),
     monto: null,
     metodo_pago: null,
     activo: false
@@ -125,22 +125,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [pagos, setPagos] = useState<Pago[]>(pagosIniciales);
   const [loading, setLoading] = useState(true);
   
-  // Cargar alumnos desde la API
+  // Cargar alumnos desde datos mock
   useEffect(() => {
-    const fetchAlumnos = async () => {
-      try {
-        const response = await axios.get('http://localhost:5002/api/alumnos');
-        setAlumnos(response.data);
-      } catch (error) {
-        console.error('Error cargando alumnos:', error);
-        // Usar datos iniciales como fallback
-        setAlumnos(alumnosIniciales);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchAlumnos();
+    // Demo: Usar datos mock directamente
+    setAlumnos(alumnosIniciales);
+    setLoading(false);
   }, []);
 
   // Agregar un nuevo alumno
