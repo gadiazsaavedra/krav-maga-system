@@ -27,7 +27,7 @@ interface Examen {
   aprobado: boolean;
   pagado: boolean;
   monto: number;
-  fecha_pago: string;
+  fecha_pago: string | null;
 }
 
 const cinturones = ['Blanco', 'Amarillo', 'Naranja', 'Verde', 'Azul', 'Marrón', 'Negro'];
