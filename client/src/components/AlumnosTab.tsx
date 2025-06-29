@@ -104,29 +104,40 @@ const AlumnosTab: React.FC = () => {
     setPage(0);
   };
 
+  // Orden jerárquico de cinturones
+  const ordenCinturones = ['Blanco', 'Amarillo', 'Naranja', 'Verde', 'Azul', 'Marrón', 'Negro'];
+  
   // Ordenar alumnos localmente
   const alumnosOrdenados = React.useMemo(() => {
     if (!alumnos || alumnos.length === 0) return [];
     
     return [...alumnos].sort((a, b) => {
-      let aValue = '';
-      let bValue = '';
-      
-      if (orderBy === 'nombre') {
-        aValue = a.nombre || '';
-        bValue = b.nombre || '';
-      } else if (orderBy === 'apellido') {
-        aValue = a.apellido || '';
-        bValue = b.apellido || '';
-      } else if (orderBy === 'cinturon') {
-        aValue = a.cinturon || '';
-        bValue = b.cinturon || '';
-      }
-      
-      if (order === 'asc') {
-        return aValue.localeCompare(bValue);
+      if (orderBy === 'cinturon') {
+        const aIndex = ordenCinturones.indexOf(a.cinturon || 'Blanco');
+        const bIndex = ordenCinturones.indexOf(b.cinturon || 'Blanco');
+        
+        if (order === 'asc') {
+          return aIndex - bIndex;
+        } else {
+          return bIndex - aIndex;
+        }
       } else {
-        return bValue.localeCompare(aValue);
+        let aValue = '';
+        let bValue = '';
+        
+        if (orderBy === 'nombre') {
+          aValue = a.nombre || '';
+          bValue = b.nombre || '';
+        } else if (orderBy === 'apellido') {
+          aValue = a.apellido || '';
+          bValue = b.apellido || '';
+        }
+        
+        if (order === 'asc') {
+          return aValue.localeCompare(bValue);
+        } else {
+          return bValue.localeCompare(aValue);
+        }
       }
     });
   }, [alumnos, order, orderBy]);
