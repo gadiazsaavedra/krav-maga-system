@@ -322,11 +322,23 @@ const IndumentariaTab: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between', 
+        alignItems: { xs: 'stretch', sm: 'center' }, 
+        mb: 3,
+        gap: 2,
+        p: { xs: 2, sm: 0 }
+      }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h5" component="h2">
-            <ShoppingCart sx={{ mr: 1, verticalAlign: 'middle' }} />
-            Gestión de Indumentaria
+          <Typography variant="h4" component="h1" sx={{ 
+            fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+            fontWeight: 600,
+            color: 'primary.main',
+            mb: { xs: 1, sm: 0 }
+          }}>
+            🛍️ Gestión de Indumentaria
           </Typography>
           {stockBajo.length > 0 && (
             <Chip 
@@ -347,13 +359,45 @@ const IndumentariaTab: React.FC = () => {
             variant="contained"
             startIcon={<Add />}
             onClick={() => setOpen(true)}
+            size="large"
+            sx={{ 
+              minHeight: { xs: 56, sm: 48 },
+              fontSize: { xs: '1rem', sm: '1rem' },
+              borderRadius: 3,
+              textTransform: 'none',
+              fontWeight: 600,
+              boxShadow: 3,
+              '&:hover': {
+                boxShadow: 6,
+                transform: 'translateY(-1px)'
+              }
+            }}
           >
             Nuevo Pedido
           </Button>
         </Box>
       </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ 
+        overflowX: 'auto',
+        borderRadius: 3,
+        boxShadow: 3,
+        '& .MuiTableHead-root': {
+          backgroundColor: 'primary.main',
+          '& .MuiTableCell-head': {
+            color: 'white',
+            fontWeight: 600,
+            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+          }
+        },
+        '& .MuiTableRow-root:nth-of-type(even)': {
+          backgroundColor: 'grey.50'
+        },
+        '& .MuiTableRow-root:hover': {
+          backgroundColor: 'primary.light',
+          cursor: 'pointer'
+        }
+      }}>
         <Table>
           <TableHead>
             <AlumnoTableRow isHeader>
