@@ -195,7 +195,7 @@ const AlumnosTab: React.FC = () => {
       const nuevoAlumno = {
         id: Math.max(...alumnosLocal.map((a: Alumno) => a.id)) + 1,
         ...formData,
-        fecha_registro: new Date().toISOString().split('T')[0],
+        fecha_registro: formData.fecha_registro || new Date().toISOString().split('T')[0],
         activo: 1,
         inasistencias_recientes: 0
       };
