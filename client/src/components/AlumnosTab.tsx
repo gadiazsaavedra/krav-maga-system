@@ -179,7 +179,7 @@ const AlumnosTab: React.FC = () => {
       };
       
       // Actualizar en estado local
-      setAlumnosLocal(prevAlumnos => {
+      setAlumnosLocal((prevAlumnos: Alumno[]) => {
         const index = prevAlumnos.findIndex(a => a.id === editingAlumno.id);
         if (index !== -1) {
           const nuevosAlumnos = [...prevAlumnos];
@@ -201,7 +201,7 @@ const AlumnosTab: React.FC = () => {
       };
       
       // Agregar a estado local
-      setAlumnosLocal(prevAlumnos => [...prevAlumnos, nuevoAlumno as any]);
+      setAlumnosLocal((prevAlumnos: Alumno[]) => [...prevAlumnos, nuevoAlumno as any]);
       
       alert('✅ Alumno creado exitosamente');
     }
@@ -630,7 +630,7 @@ const AlumnosTab: React.FC = () => {
               onClick={() => {
                 if (window.confirm(`¿Eliminar a ${editingAlumno.nombre} ${editingAlumno.apellido}?`)) {
                   // Eliminar del estado local
-                  setAlumnosLocal(prevAlumnos => 
+                  setAlumnosLocal((prevAlumnos: Alumno[]) => 
                     prevAlumnos.filter(alumno => alumno.id !== editingAlumno.id)
                   );
                   handleClose();
