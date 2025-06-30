@@ -193,7 +193,7 @@ const AlumnosTab: React.FC = () => {
     } else {
       // Crear nuevo alumno
       const nuevoAlumno = {
-        id: Math.max(...alumnosLocal.map(a => a.id)) + 1,
+        id: Math.max(...alumnosLocal.map((a: Alumno) => a.id)) + 1,
         ...formData,
         fecha_registro: new Date().toISOString().split('T')[0],
         activo: 1,
