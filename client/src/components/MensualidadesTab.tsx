@@ -12,13 +12,65 @@ import {
 import { Payment, CheckCircle, Cancel, AttachMoney, Warning } from '@mui/icons-material';
 
 const MensualidadesTab: React.FC = () => {
-  const { alumnos, pagos: estadoPagos, registrarPago } = useAppContext();
+  // Cargar alumnos desde localStorage (mismo que AlumnosTab)
+  const [alumnosLocal, setAlumnosLocal] = useState(() => {
+    const saved = localStorage.getItem('alumnos-krav-maga');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  // Sistema de pagos local con localStorage
+  const [pagosLocal, setPagosLocal] = useState(() => {
+    const saved = localStorage.getItem('pagos-krav-maga');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  // Guardar pagos en localStorage
+  useEffect(() => {
+    localStorage.setItem('pagos-krav-maga', JSON.stringify(pagosLocal));
+  }, [pagosLocal]);
+  const alumnos = alumnosLocal; // Usar alumnos de localStorage
+  
+  // Generar pagos desde alumnos locales
+  const pagosGenerados = useMemo(() => {
+    return alumnos.map((alumno: any) => {
+      // Buscar si ya existe un pago para este alumno
+      const pagoExistente = pagosLocal.find((p: any) => p.id === alumno.id);
+      
+      if (pagoExistente) {
+        return pagoExistente; // Usar pago existente
+      }
+      
+      // Crear nuevo pago pendiente
+      return {
+        id: alumno.id,
+        nombre: alumno.nombre,
+        apellido: alumno.apellido,
+        estado: 'Pendiente',
+        dias_atraso: Math.floor(Math.random() * 30),
+        fecha_limite: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        fecha_pago: null,
+        monto: null,
+        metodo_pago: null
+      };
+    });
+  }, [alumnos, pagosLocal]);
   const [open, setOpen] = useState(false);
   const [selectedMes, setSelectedMes] = useState(6); // Junio
   const [selectedAño, setSelectedAño] = useState(2025);
   const [pagoRapidoOpen, setPagoRapidoOpen] = useState(false);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any>(null);
-  const [tarifas, setTarifas] = useState<{id: number, nombre: string, valor: number, descripcion: string}[]>([]);
+  const [tarifas, setTarifas] = useState<{id: number, nombre: string, valor: number, descripcion: string}[]>(() => {
+    const saved = localStorage.getItem('tarifas-krav-maga');
+    return saved ? JSON.parse(saved) : [
+      { id: 1, nombre: 'regular', valor: 58000, descripcion: 'Tarifa mensual regular' },
+      { id: 2, nombre: 'nueva', valor: 64000, descripcion: 'Tarifa para alumnos nuevos o reincorporación' }
+    ];
+  });
+  
+  // Guardar tarifas en localStorage
+  useEffect(() => {
+    localStorage.setItem('tarifas-krav-maga', JSON.stringify(tarifas));
+  }, [tarifas]);
   const [tarifasOpen, setTarifasOpen] = useState(false);
   const [editandoTarifa, setEditandoTarifa] = useState<{id: number, valor: number} | null>(null);
   const [formData, setFormData] = useState({
@@ -32,23 +84,11 @@ const MensualidadesTab: React.FC = () => {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
   
-  // Cargar tarifas
-  useEffect(() => {
-    const fetchTarifas = async () => {
-      try {
-        const response = await axios.get('http://localhost:5002/api/tarifas');
-        setTarifas(response.data);
-      } catch (error) {
-        console.error('Error cargando tarifas:', error);
-      }
-    };
-    
-    fetchTarifas();
-  }, []);
+  // Las tarifas ya se cargan desde localStorage en useState
 
   // Ordenar pagos: morosos primero, luego por fecha límite
   const pagosOrdenados = useMemo(() => {
-    return [...estadoPagos].sort((a, b) => {
+    return [...pagosGenerados].sort((a, b) => {
       // Primero los pendientes
       if (a.estado === 'Pendiente' && b.estado === 'Pagado') return -1;
       if (a.estado === 'Pagado' && b.estado === 'Pendiente') return 1;
@@ -65,15 +105,15 @@ const MensualidadesTab: React.FC = () => {
       
       return 0;
     });
-  }, [estadoPagos]);
+  }, [pagosGenerados]);
 
-  const pagados = estadoPagos.filter(p => p.estado === 'Pagado').length;
-  // const pendientes = estadoPagos.filter(p => p.estado === 'Pendiente').length;
-  const morosos = estadoPagos.filter(p => p.estado === 'Pendiente' && p.dias_atraso > 0).length;
-  const inactivos = estadoPagos.filter(p => p.estado === 'Pendiente' && p.dias_atraso > 90).length;
-  const totalRecaudado = estadoPagos
-    .filter(p => p.estado === 'Pagado')
-    .reduce((sum, p) => sum + (p.monto || 0), 0);
+  const pagados = pagosGenerados.filter((p: any) => p.estado === 'Pagado').length;
+  // const pendientes = pagosGenerados.filter((p: any) => p.estado === 'Pendiente').length;
+  const morosos = pagosGenerados.filter((p: any) => p.estado === 'Pendiente' && p.dias_atraso > 0).length;
+  const inactivos = pagosGenerados.filter((p: any) => p.estado === 'Pendiente' && p.dias_atraso > 90).length;
+  const totalRecaudado = pagosGenerados
+    .filter((p: any) => p.estado === 'Pagado')
+    .reduce((sum: number, p: any) => sum + (p.monto || 0), 0);
 
   const handlePagoRapido = (pago: any) => {
     setAlumnoSeleccionado(pago);
@@ -91,7 +131,29 @@ const MensualidadesTab: React.FC = () => {
         ? (tarifaNueva?.valor || 64000)
         : (tarifaRegular?.valor || 58000);
       
-      registrarPago(alumnoSeleccionado.id, monto, 'Efectivo');
+      // Registrar pago rápido en localStorage
+      const nuevoPago = {
+        id: alumnoSeleccionado.id,
+        nombre: alumnoSeleccionado.nombre,
+        apellido: alumnoSeleccionado.apellido,
+        estado: 'Pagado',
+        dias_atraso: 0,
+        fecha_limite: alumnoSeleccionado.fecha_limite,
+        fecha_pago: new Date().toISOString().split('T')[0],
+        monto: monto,
+        metodo_pago: 'Efectivo'
+      };
+      
+      setPagosLocal((prevPagos: any[]) => {
+        const index = prevPagos.findIndex((p: any) => p.id === alumnoSeleccionado.id);
+        if (index !== -1) {
+          const nuevosPagos = [...prevPagos];
+          nuevosPagos[index] = nuevoPago;
+          return nuevosPagos;
+        } else {
+          return [...prevPagos, nuevoPago];
+        }
+      });
       setPagoRapidoOpen(false);
       setAlumnoSeleccionado(null);
     }
@@ -118,12 +180,34 @@ const MensualidadesTab: React.FC = () => {
     }
     
     const alumnoId = parseInt(formData.alumno_id);
-    const alumno = alumnos.find(a => a.id === alumnoId);
+    const alumno = alumnos.find((a: any) => a.id === alumnoId);
     
     if (!alumno) return;
     
-    // Registrar el pago usando el contexto
-    registrarPago(alumnoId, parseFloat(formData.monto), formData.metodo_pago);
+    // Registrar el pago en localStorage
+    const nuevoPago = {
+      id: alumnoId,
+      nombre: alumno.nombre,
+      apellido: alumno.apellido,
+      estado: 'Pagado',
+      dias_atraso: 0,
+      fecha_limite: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      fecha_pago: new Date().toISOString().split('T')[0],
+      monto: parseFloat(formData.monto),
+      metodo_pago: formData.metodo_pago
+    };
+    
+    // Actualizar o agregar pago
+    setPagosLocal((prevPagos: any[]) => {
+      const index = prevPagos.findIndex((p: any) => p.id === alumnoId);
+      if (index !== -1) {
+        const nuevosPagos = [...prevPagos];
+        nuevosPagos[index] = nuevoPago;
+        return nuevosPagos;
+      } else {
+        return [...prevPagos, nuevoPago];
+      }
+    });
     
     handleClose();
     alert('Pago registrado exitosamente');
@@ -131,7 +215,7 @@ const MensualidadesTab: React.FC = () => {
   
   // Obtener el monto sugerido para un alumno
   const obtenerMontoSugerido = (alumnoId: number) => {
-    const alumno = estadoPagos.find(p => p.id === alumnoId);
+    const alumno = pagosGenerados.find((p: any) => p.id === alumnoId);
     if (!alumno) return 58000; // Valor por defecto
     
     const tarifaRegular = tarifas.find(t => t.nombre === 'regular');
@@ -153,14 +237,11 @@ const MensualidadesTab: React.FC = () => {
     });
   };
   
-  const handleTarifaChange = async (id: number, nuevoValor: number) => {
-    try {
-      await axios.put(`http://localhost:5002/api/tarifas/${id}`, { valor: nuevoValor });
-      setTarifas(prev => prev.map(t => t.id === id ? {...t, valor: nuevoValor} : t));
-      setEditandoTarifa(null);
-    } catch (error) {
-      console.error('Error actualizando tarifa:', error);
-    }
+  const handleTarifaChange = (id: number, nuevoValor: number) => {
+    // Actualizar tarifa en localStorage
+    setTarifas(prev => prev.map(t => t.id === id ? {...t, valor: nuevoValor} : t));
+    setEditandoTarifa(null);
+    alert('✅ Tarifa actualizada exitosamente');
   };
 
   return (
@@ -351,9 +432,9 @@ const MensualidadesTab: React.FC = () => {
             <Grid item xs={12}>
               <Autocomplete
                 options={alumnos}
-                getOptionLabel={(alumno) => `${alumno.apellido}, ${alumno.nombre}`}
+                getOptionLabel={(alumno: any) => `${alumno.apellido}, ${alumno.nombre}`}
                 renderInput={(params) => <TextField {...params} label="Buscar Alumno" />}
-                onChange={(event, newValue) => {
+                onChange={(event, newValue: any) => {
                   if (newValue) {
                     const montoSugerido = obtenerMontoSugerido(newValue.id);
                     setFormData({ 
@@ -363,7 +444,7 @@ const MensualidadesTab: React.FC = () => {
                     });
                   }
                 }}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
+                isOptionEqualToValue={(option: any, value: any) => option.id === value.id}
                 fullWidth
               />
             </Grid>

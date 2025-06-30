@@ -82,7 +82,13 @@ const AlumnosTab: React.FC = () => {
     telefono: '',
     email: '',
     fecha_nacimiento: '',
-    fecha_registro: '',
+    fecha_registro: (() => {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    })(), // Fecha local sin UTC
     grupo: 'Lunes y Miércoles 17:00-18:00',
     cinturon: 'Blanco'
   };
@@ -195,7 +201,8 @@ const AlumnosTab: React.FC = () => {
       const nuevoAlumno = {
         id: Math.max(...alumnosLocal.map((a: Alumno) => a.id)) + 1,
         ...formData,
-        fecha_registro: formData.fecha_registro || new Date().toISOString().split('T')[0],
+        fecha_registro: formData.fecha_registro,
+
         activo: 1,
         inasistencias_recientes: 0
       };
@@ -203,6 +210,7 @@ const AlumnosTab: React.FC = () => {
       // Agregar a estado local
       setAlumnosLocal((prevAlumnos: Alumno[]) => [...prevAlumnos, nuevoAlumno as any]);
       
+
       alert('✅ Alumno creado exitosamente');
     }
     
@@ -416,10 +424,7 @@ const AlumnosTab: React.FC = () => {
                 </TableCell>
                 <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                   <Typography variant="caption">
-                    {alumno.fecha_registro ? 
-                      new Date(alumno.fecha_registro).toLocaleDateString() : 
-                      new Date().toLocaleDateString()
-                    }
+                    {alumno.fecha_registro || 'Sin fecha'}
                   </Typography>
                 </TableCell>
                 <TableCell>

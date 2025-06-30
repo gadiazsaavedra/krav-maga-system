@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AlumnoTableRow from './AlumnoTableRow';
 import LoadingSpinner from './LoadingSpinner';
 import { useProductos, useStockBajo, useCreateProducto, useUpdateProducto } from '../hooks/useProductos';
@@ -7,7 +7,7 @@ import {
   Box, Typography, Button, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, Select, MenuItem, FormControl, InputLabel,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, Chip, Grid, Autocomplete
+  Paper, Chip, Grid, Autocomplete, TableSortLabel
 } from '@mui/material';
 import { ShoppingCart, Add } from '@mui/icons-material';
 import axios from 'axios';
@@ -47,9 +47,19 @@ const IndumentariaTab: React.FC = () => {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [open, setOpen] = useState(false);
   
-  // Usar datos mock para demo
-  const productos = mockProductos;
-  const stockBajo = mockProductos.filter(p => p.stock <= p.stock_minimo);
+  // Sistema de productos local con localStorage
+  const [productosLocal, setProductosLocal] = useState(() => {
+    const saved = localStorage.getItem('productos-krav-maga');
+    return saved ? JSON.parse(saved) : mockProductos;
+  });
+  
+  // Guardar productos en localStorage
+  useEffect(() => {
+    localStorage.setItem('productos-krav-maga', JSON.stringify(productosLocal));
+  }, [productosLocal]);
+  
+  const productos = productosLocal;
+  const stockBajo = productosLocal.filter((p: any) => p.stock <= p.stock_minimo);
   const productosLoading = false;
   // const { data: productos = [], isLoading: productosLoading } = useProductos();
   // const { data: stockBajo = [] } = useStockBajo();
@@ -67,6 +77,10 @@ const IndumentariaTab: React.FC = () => {
   const [editandoPrecio, setEditandoPrecio] = useState<{id: number, precio: number} | null>(null);
   const [editandoStock, setEditandoStock] = useState<{id: number, stock: number} | null>(null);
   const [editandoMinimo, setEditandoMinimo] = useState<{id: number, minimo: number} | null>(null);
+  
+  // Estados para ordenamiento de pedidos
+  const [orderBy, setOrderBy] = useState<'alumno' | 'producto' | 'estado' | 'fecha_pedido'>('fecha_pedido');
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
 
   const [nuevoProducto, setNuevoProducto] = useState({ tipo: '', talle: '', precio: 0, stock: 0, stock_minimo: 5 });
   const [formData, setFormData] = useState({
@@ -89,13 +103,11 @@ const IndumentariaTab: React.FC = () => {
     // Ya no se usa, React Query maneja esto
   };
 
-  const fetchAlumnos = async () => {
-    // Demo: usar datos mock
-    setAlumnos([
-      { id: 1, nombre: 'Juan', apellido: 'Pérez' },
-      { id: 2, nombre: 'María', apellido: 'González' },
-      { id: 3, nombre: 'Carlos', apellido: 'Rodríguez' }
-    ]);
+  const fetchAlumnos = () => {
+    // Cargar alumnos desde localStorage (mismo que AlumnosTab)
+    const saved = localStorage.getItem('alumnos-krav-maga');
+    const alumnosLocal = saved ? JSON.parse(saved) : [];
+    setAlumnos(alumnosLocal);
   };
 
   const fetchProductos = async () => {
@@ -187,7 +199,7 @@ const IndumentariaTab: React.FC = () => {
     }
     
     const alumnoSeleccionado = alumnos.find(a => a.id === Number(formData.alumno_id));
-    const productoSeleccionado = productos.find(p => p.id === Number(formData.producto_id));
+    const productoSeleccionado = productos.find((p: any) => p.id === Number(formData.producto_id));
     
     if (!alumnoSeleccionado || !productoSeleccionado) {
       alert('Error: Alumno o producto no encontrado');
@@ -235,79 +247,120 @@ const IndumentariaTab: React.FC = () => {
     );
   };
 
-  const handlePrecioChange = async (productoId: number, nuevoPrecio: number) => {
-    try {
-      await updateProductoMutation.mutateAsync({ id: productoId, precio: nuevoPrecio });
-      setEditandoPrecio(null);
-    } catch (error) {
-      console.error('Error updating precio:', error);
-    }
+  const handlePrecioChange = (productoId: number, nuevoPrecio: number) => {
+    // Actualizar precio en localStorage
+    setProductosLocal((prevProductos: any[]) => 
+      prevProductos.map((p: any) => 
+        p.id === productoId ? { ...p, precio: nuevoPrecio } : p
+      )
+    );
+    setEditandoPrecio(null);
+    alert('✅ Precio actualizado exitosamente');
   };
 
-  const handlePrecioMasivo = async (tipo: string, nuevoPrecio: number) => {
-    try {
-      const productosDelTipo = productos.filter(p => p.tipo === tipo);
-      await Promise.all(
-        productosDelTipo.map(p => 
-          axios.put(`http://localhost:5002/api/productos/${p.id}`, { precio: nuevoPrecio })
-        )
-      );
-      fetchProductos();
-      setEditandoPrecio(null);
-    } catch (error) {
-      console.error('Error updating precios masivos:', error);
-    }
+  const handlePrecioMasivo = (tipo: string, nuevoPrecio: number) => {
+    // Actualizar precios masivos en localStorage
+    setProductosLocal((prevProductos: any[]) => 
+      prevProductos.map((p: any) => 
+        p.tipo === tipo ? { ...p, precio: nuevoPrecio } : p
+      )
+    );
+    setEditandoPrecio(null);
+    const cantidad = productos.filter((p: any) => p.tipo === tipo).length;
+    alert(`✅ ${cantidad} productos de tipo "${tipo}" actualizados`);
   };
 
-  const handleStockChange = async (productoId: number, nuevoStock: number) => {
-    try {
-      await updateProductoMutation.mutateAsync({ id: productoId, stock: nuevoStock });
-      setEditandoStock(null);
-    } catch (error) {
-      console.error('Error updating stock:', error);
-    }
+  const handleStockChange = (productoId: number, nuevoStock: number) => {
+    // Actualizar stock en localStorage
+    setProductosLocal((prevProductos: any[]) => 
+      prevProductos.map((p: any) => 
+        p.id === productoId ? { ...p, stock: nuevoStock } : p
+      )
+    );
+    setEditandoStock(null);
+    alert('✅ Stock actualizado exitosamente');
   };
 
-  const handleMinimoChange = async (productoId: number, nuevoMinimo: number) => {
-    try {
-      await axios.put(`http://localhost:5002/api/productos/${productoId}`, { stock_minimo: nuevoMinimo });
-      fetchProductos();
-      fetchStockBajo();
-      setEditandoMinimo(null);
-    } catch (error) {
-      console.error('Error updating stock minimo:', error);
-    }
+  const handleMinimoChange = (productoId: number, nuevoMinimo: number) => {
+    // Actualizar stock mínimo en localStorage
+    setProductosLocal((prevProductos: any[]) => 
+      prevProductos.map((p: any) => 
+        p.id === productoId ? { ...p, stock_minimo: nuevoMinimo } : p
+      )
+    );
+    setEditandoMinimo(null);
+    alert('✅ Stock mínimo actualizado exitosamente');
   };
 
-  const handleEliminarProducto = async (productoId: number) => {
+  const handleEliminarProducto = (productoId: number) => {
     if (window.confirm('¿Eliminar este producto?')) {
-      try {
-        await axios.delete(`http://localhost:5002/api/productos/${productoId}`);
-        fetchProductos();
-      } catch (error) {
-        console.error('Error eliminando producto:', error);
-      }
+      // Eliminar producto de localStorage
+      setProductosLocal((prevProductos: any[]) => 
+        prevProductos.filter((p: any) => p.id !== productoId)
+      );
+      alert('✅ Producto eliminado exitosamente');
     }
   };
 
-  const handleCrearProducto = async () => {
-    try {
-      if (!nuevoProducto.tipo || !nuevoProducto.talle) {
-        alert('Por favor complete el tipo y talle del producto');
-        return;
+  const handleCrearProducto = () => {
+    if (!nuevoProducto.tipo || !nuevoProducto.talle) {
+      alert('Por favor complete el tipo y talle del producto');
+      return;
+    }
+    
+    // Crear producto en localStorage
+    const productoConId = {
+      ...nuevoProducto,
+      id: Math.max(...productosLocal.map((p: any) => p.id)) + 1
+    };
+    
+    setProductosLocal((prevProductos: any[]) => [...prevProductos, productoConId]);
+    
+    setNuevoProductoOpen(false);
+    setNuevoProducto({ tipo: '', talle: '', precio: 0, stock: 0, stock_minimo: 5 });
+    
+    alert('✅ Producto creado exitosamente');
+  };
+
+  // Función para manejar ordenamiento
+  const handleRequestSort = (property: 'alumno' | 'producto' | 'estado' | 'fecha_pedido') => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+  
+  // Ordenar pedidos
+  const pedidosOrdenados = React.useMemo(() => {
+    return [...pedidos].sort((a, b) => {
+      let aValue = '';
+      let bValue = '';
+      
+      switch (orderBy) {
+        case 'alumno':
+          aValue = `${a.apellido}, ${a.nombre}`;
+          bValue = `${b.apellido}, ${b.nombre}`;
+          break;
+        case 'producto':
+          aValue = a.tipo;
+          bValue = b.tipo;
+          break;
+        case 'estado':
+          aValue = a.estado;
+          bValue = b.estado;
+          break;
+        case 'fecha_pedido':
+          aValue = a.fecha_pedido;
+          bValue = b.fecha_pedido;
+          break;
       }
       
-      await createProductoMutation.mutateAsync(nuevoProducto);
-      
-      setNuevoProductoOpen(false);
-      setNuevoProducto({ tipo: '', talle: '', precio: 0, stock: 0, stock_minimo: 5 });
-      
-      alert('Producto creado exitosamente');
-    } catch (error) {
-      console.error('Error creando producto:', error);
-      alert('Error al crear el producto. Intente nuevamente.');
-    }
-  };
+      if (order === 'asc') {
+        return aValue.localeCompare(bValue);
+      } else {
+        return bValue.localeCompare(aValue);
+      }
+    });
+  }, [pedidos, order, orderBy]);
 
   const getEstadoColor = (estado: string) => {
     switch (estado) {
@@ -318,7 +371,7 @@ const IndumentariaTab: React.FC = () => {
     }
   };
 
-  const selectedProducto = productos.find(p => p.id === Number(formData.producto_id));
+  const selectedProducto = productos.find((p: any) => p.id === Number(formData.producto_id));
 
   return (
     <Box>
@@ -402,18 +455,50 @@ const IndumentariaTab: React.FC = () => {
         <Table>
           <TableHead>
             <AlumnoTableRow isHeader>
-              <TableCell>Alumno</TableCell>
-              <TableCell>Producto</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'alumno'}
+                  direction={orderBy === 'alumno' ? order : 'asc'}
+                  onClick={() => handleRequestSort('alumno')}
+                >
+                  Alumno
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'producto'}
+                  direction={orderBy === 'producto' ? order : 'asc'}
+                  onClick={() => handleRequestSort('producto')}
+                >
+                  Producto
+                </TableSortLabel>
+              </TableCell>
               <TableCell>Talle</TableCell>
               <TableCell>Cantidad</TableCell>
               <TableCell>Monto</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Fecha Pedido</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'estado'}
+                  direction={orderBy === 'estado' ? order : 'asc'}
+                  onClick={() => handleRequestSort('estado')}
+                >
+                  Estado
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === 'fecha_pedido'}
+                  direction={orderBy === 'fecha_pedido' ? order : 'asc'}
+                  onClick={() => handleRequestSort('fecha_pedido')}
+                >
+                  Fecha Pedido
+                </TableSortLabel>
+              </TableCell>
               <TableCell>Acciones</TableCell>
             </AlumnoTableRow>
           </TableHead>
           <TableBody>
-            {pedidos.map((pedido) => (
+            {pedidosOrdenados.map((pedido) => (
               <TableRow key={pedido.id}>
                 <TableCell>{`${pedido.apellido}, ${pedido.nombre}`}</TableCell>
                 <TableCell>{pedido.tipo}</TableCell>
@@ -468,7 +553,7 @@ const IndumentariaTab: React.FC = () => {
                 <Select
                   value={formData.producto_id}
                   onChange={(e) => {
-                    const producto = productos.find(p => p.id === Number(e.target.value));
+                    const producto = productos.find((p: any) => p.id === Number(e.target.value));
                     setFormData({ 
                       ...formData, 
                       producto_id: e.target.value,
@@ -476,7 +561,7 @@ const IndumentariaTab: React.FC = () => {
                     });
                   }}
                 >
-                  {productos.map((producto) => (
+                  {productos.map((producto: any) => (
                     <MenuItem key={producto.id} value={producto.id}>
                       {`${producto.tipo} - Talle ${producto.talle} - $${producto.precio.toLocaleString()}`}
                     </MenuItem>
@@ -542,7 +627,7 @@ const IndumentariaTab: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {productos.map((producto) => (
+                {productos.map((producto: any) => (
                   <TableRow key={producto.id}>
                     <TableCell>{producto.tipo}</TableCell>
                     <TableCell>{producto.talle}</TableCell>
@@ -551,11 +636,11 @@ const IndumentariaTab: React.FC = () => {
                         <TextField
                           size="small"
                           type="number"
-                          value={editandoPrecio.precio}
-                          onChange={(e) => setEditandoPrecio({...editandoPrecio, precio: Number(e.target.value)})}
+                          value={editandoPrecio!.precio}
+                          onChange={(e) => setEditandoPrecio({...editandoPrecio!, precio: Number(e.target.value)})}
                           onKeyPress={(e) => {
                             if (e.key === 'Enter') {
-                              handlePrecioChange(producto.id, editandoPrecio.precio);
+                              handlePrecioChange(producto.id, editandoPrecio!.precio);
                             }
                           }}
                           autoFocus
@@ -569,11 +654,11 @@ const IndumentariaTab: React.FC = () => {
                         <TextField
                           size="small"
                           type="number"
-                          value={editandoStock.stock}
-                          onChange={(e) => setEditandoStock({...editandoStock, stock: Number(e.target.value)})}
+                          value={editandoStock!.stock}
+                          onChange={(e) => setEditandoStock({...editandoStock!, stock: Number(e.target.value)})}
                           onKeyPress={(e) => {
                             if (e.key === 'Enter') {
-                              handleStockChange(producto.id, editandoStock.stock);
+                              handleStockChange(producto.id, editandoStock!.stock);
                             }
                           }}
                           autoFocus
@@ -587,11 +672,11 @@ const IndumentariaTab: React.FC = () => {
                         <TextField
                           size="small"
                           type="number"
-                          value={editandoMinimo.minimo}
-                          onChange={(e) => setEditandoMinimo({...editandoMinimo, minimo: Number(e.target.value)})}
+                          value={editandoMinimo!.minimo}
+                          onChange={(e) => setEditandoMinimo({...editandoMinimo!, minimo: Number(e.target.value)})}
                           onKeyPress={(e) => {
                             if (e.key === 'Enter') {
-                              handleMinimoChange(producto.id, editandoMinimo.minimo);
+                              handleMinimoChange(producto.id, editandoMinimo!.minimo);
                             }
                           }}
                           autoFocus
@@ -604,18 +689,18 @@ const IndumentariaTab: React.FC = () => {
                       <Box sx={{ display: 'flex', gap: 0.5 }}>
                         {editandoPrecio?.id === producto.id ? (
                           <>
-                            <Button size="small" onClick={() => handlePrecioChange(producto.id, editandoPrecio.precio)} title="Solo este">✓</Button>
-                            <Button size="small" onClick={() => handlePrecioMasivo(producto.tipo, editandoPrecio.precio)} title="Todos" color="warning">✓✓</Button>
+                            <Button size="small" onClick={() => handlePrecioChange(producto.id, editandoPrecio!.precio)} title="Solo este">✓</Button>
+                            <Button size="small" onClick={() => handlePrecioMasivo(producto.tipo, editandoPrecio!.precio)} title="Todos" color="warning">✓✓</Button>
                             <Button size="small" onClick={() => setEditandoPrecio(null)}>✗</Button>
                           </>
                         ) : editandoStock?.id === producto.id ? (
                           <>
-                            <Button size="small" onClick={() => handleStockChange(producto.id, editandoStock.stock)}>✓</Button>
+                            <Button size="small" onClick={() => handleStockChange(producto.id, editandoStock!.stock)}>✓</Button>
                             <Button size="small" onClick={() => setEditandoStock(null)}>✗</Button>
                           </>
                         ) : editandoMinimo?.id === producto.id ? (
                           <>
-                            <Button size="small" onClick={() => handleMinimoChange(producto.id, editandoMinimo.minimo)}>✓</Button>
+                            <Button size="small" onClick={() => handleMinimoChange(producto.id, editandoMinimo!.minimo)}>✓</Button>
                             <Button size="small" onClick={() => setEditandoMinimo(null)}>✗</Button>
                           </>
                         ) : (
