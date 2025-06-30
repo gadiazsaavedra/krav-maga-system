@@ -619,18 +619,12 @@ const AlumnosTab: React.FC = () => {
             <Button 
               onClick={() => {
                 if (window.confirm(`¿Eliminar a ${editingAlumno.nombre} ${editingAlumno.apellido}?`)) {
-                  updateAlumnoMutation.mutateAsync({ 
-                    id: editingAlumno.id, 
-                    ...formData,
-                    activo: 0 
-                  })
-                    .then(() => {
-                      handleClose();
-                      alert('Alumno eliminado exitosamente');
-                    })
-                    .catch(() => {
-                      alert('Error al eliminar el alumno');
-                    });
+                  // Eliminar del estado local
+                  setAlumnosLocal(prevAlumnos => 
+                    prevAlumnos.filter(alumno => alumno.id !== editingAlumno.id)
+                  );
+                  handleClose();
+                  alert('✅ Alumno eliminado exitosamente');
                 }
               }}
               color="error"
