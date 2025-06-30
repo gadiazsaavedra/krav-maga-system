@@ -165,7 +165,9 @@ const AlumnosTab: React.FC = () => {
       const alumnoActualizado = {
         ...editingAlumno,
         ...formData,
-        activo: editingAlumno.activo || 1
+        activo: editingAlumno.activo || 1,
+        // Asegurar que fecha_registro se actualice
+        fecha_registro: formData.fecha_registro || editingAlumno.fecha_registro
       };
       
       // Actualizar en estado local
