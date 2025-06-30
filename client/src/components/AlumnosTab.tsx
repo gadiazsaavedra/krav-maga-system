@@ -58,8 +58,16 @@ const AlumnosTab: React.FC = () => {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<OrderBy>('apellido');
   
-  // Estado local para alumnos
-  const [alumnosLocal, setAlumnosLocal] = useState(mockAlumnos);
+  // Estado local para alumnos con persistencia
+  const [alumnosLocal, setAlumnosLocal] = useState(() => {
+    const saved = localStorage.getItem('alumnos-krav-maga');
+    return saved ? JSON.parse(saved) : mockAlumnos;
+  });
+  
+  // Guardar en localStorage cuando cambie el estado
+  React.useEffect(() => {
+    localStorage.setItem('alumnos-krav-maga', JSON.stringify(alumnosLocal));
+  }, [alumnosLocal]);
   const alumnosData = { data: alumnosLocal, total: alumnosLocal.length };
   const isLoading = false;
   const error = null;
