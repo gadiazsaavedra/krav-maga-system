@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import axios from 'axios';
 
 // Interfaces
 export interface Alumno {
@@ -135,13 +134,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Agregar un nuevo alumno
   const agregarAlumno = async (alumno: Omit<Alumno, 'id' | 'fecha_registro'>) => {
     try {
-      // Guardar en la base de datos
-      const response = await axios.post('http://localhost:5002/api/alumnos', alumno);
+      // Generar ID local (ya no usamos API)
+      const maxId = alumnos.reduce((max, a) => Math.max(max, a.id), 0);
       
       // Obtener el alumno con el ID asignado
       const nuevoAlumno: Alumno = {
         ...alumno,
-        id: response.data.id,
+        id: maxId + 1,
         fecha_registro: new Date().toISOString().split('T')[0]
       };
       
@@ -177,10 +176,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Actualizar un alumno existente
   const actualizarAlumno = async (id: number, alumnoActualizado: Partial<Alumno>) => {
     try {
-      // Actualizar en la base de datos
-      await axios.put(`http://localhost:5002/api/alumnos/${id}`, alumnoActualizado);
-      
-      // Actualizar en el estado local
+      // Actualizar en el estado local (ya no usamos API)
       setAlumnos(prev => prev.map(alumno => 
         alumno.id === id ? { ...alumno, ...alumnoActualizado } : alumno
       ));

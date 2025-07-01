@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import AlumnoTableRow from './AlumnoTableRow';
-import LoadingSpinner from './LoadingSpinner';
-import { useProductos, useStockBajo, useCreateProducto, useUpdateProducto } from '../hooks/useProductos';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import { mockProductos } from '../data/mockData';
 import {
   Box, Typography, Button, Dialog, DialogTitle, DialogContent,
@@ -9,8 +8,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Paper, Chip, Grid, Autocomplete, TableSortLabel
 } from '@mui/material';
-import { ShoppingCart, Add } from '@mui/icons-material';
-import axios from 'axios';
+import { Add } from '@mui/icons-material';
 
 interface Alumno {
   id: number;
@@ -18,14 +16,15 @@ interface Alumno {
   apellido: string;
 }
 
-interface Producto {
-  id: number;
-  tipo: string;
-  talle: string;
-  precio: number;
-  stock?: number;
-  stock_minimo?: number;
-}
+// Interface comentada porque no se usa
+// interface Producto {
+//   id: number;
+//   tipo: string;
+//   talle: string;
+//   precio: number;
+//   stock?: number;
+//   stock_minimo?: number;
+// }
 
 interface Pedido {
   id: number;
@@ -47,24 +46,15 @@ const IndumentariaTab: React.FC = () => {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [open, setOpen] = useState(false);
   
-  // Sistema de productos local con localStorage
-  const [productosLocal, setProductosLocal] = useState(() => {
-    const saved = localStorage.getItem('productos-krav-maga');
-    return saved ? JSON.parse(saved) : mockProductos;
-  });
-  
-  // Guardar productos en localStorage
-  useEffect(() => {
-    localStorage.setItem('productos-krav-maga', JSON.stringify(productosLocal));
-  }, [productosLocal]);
+  // Hook personalizado para localStorage
+  const [productosLocal, setProductosLocal] = useLocalStorage('productos-krav-maga', mockProductos);
   
   const productos = productosLocal;
   const stockBajo = productosLocal.filter((p: any) => p.stock <= p.stock_minimo);
-  const productosLoading = false;
-  // const { data: productos = [], isLoading: productosLoading } = useProductos();
-  // const { data: stockBajo = [] } = useStockBajo();
-  const createProductoMutation = useCreateProducto();
-  const updateProductoMutation = useUpdateProducto();
+  // Variables no utilizadas comentadas
+  // const productosLoading = false;
+  // const createProductoMutation = useCreateProducto();
+  // const updateProductoMutation = useUpdateProducto();
   
   // Refrescar alumnos cuando se abre el modal
   useEffect(() => {
@@ -99,10 +89,6 @@ const IndumentariaTab: React.FC = () => {
   // const setProductos = () => {};
   // const setStockBajo = () => {};
 
-  const fetchStockBajo = async () => {
-    // Ya no se usa, React Query maneja esto
-  };
-
   const fetchAlumnos = () => {
     // Cargar alumnos desde localStorage (mismo que AlumnosTab)
     const saved = localStorage.getItem('alumnos-krav-maga');
@@ -110,9 +96,9 @@ const IndumentariaTab: React.FC = () => {
     setAlumnos(alumnosLocal);
   };
 
-  const fetchProductos = async () => {
-    // Ya no se usa, React Query maneja esto
-  };
+  // Funciones no utilizadas comentadas
+  // const fetchStockBajo = async () => {};
+  // const fetchProductos = async () => {};
 
   const fetchPedidos = async () => {
     // Demo: Usar datos mock de pedidos

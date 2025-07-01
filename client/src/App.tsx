@@ -4,8 +4,7 @@ import { CssBaseline, AppBar, Toolbar, Typography, Container, Tabs, Tab, Box } f
 // import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 // import 'dayjs/locale/es';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+// React Query removido - no se usa
 import { AppProvider } from './context/AppContext';
 
 import { lazy, Suspense } from 'react';
@@ -86,16 +85,7 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutos
-      gcTime: 10 * 60 * 1000, // 10 minutos
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+// QueryClient removido - no se usa
 
 function App() {
   const [tabValue, setTabValue] = useState(0);
@@ -105,7 +95,6 @@ function App() {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
       <AppProvider>
         <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -188,8 +177,6 @@ function App() {
         </Container>
         </ThemeProvider>
       </AppProvider>
-      {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
-    </QueryClientProvider>
   );
 }
 

@@ -125,7 +125,7 @@ const AsistenciasTab: React.FC = () => {
     fetchAsistencias();
     
     setLoading(false);
-  }, [selectedTurno, selectedFecha]);
+  };
   
   // Cargar alumnos cuando cambia turno o fecha
   useEffect(() => {

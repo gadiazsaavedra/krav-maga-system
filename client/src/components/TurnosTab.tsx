@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, Grid, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Chip, Button, Dialog,
@@ -19,22 +19,35 @@ const turnos = [
   { id: 8, dia: 'Miércoles', hora_inicio: '20:00', hora_fin: '21:00', niveles: ['Naranja', 'Verde'] },
   { id: 9, dia: 'Martes', hora_inicio: '13:00', hora_fin: '14:00', niveles: ['Blanco', 'Amarillo'] },
   { id: 10, dia: 'Jueves', hora_inicio: '13:00', hora_fin: '14:00', niveles: ['Blanco', 'Amarillo'] },
-  { id: 11, dia: 'Viernes', hora_inicio: '19:00', hora_fin: '21:00', niveles: ['Blanco', 'Amarillo', 'Naranja'] }
+  { id: 11, dia: 'Viernes', hora_inicio: '17:30', hora_fin: '19:10', niveles: ['Blanco'] },
+  { id: 12, dia: 'Viernes', hora_inicio: '19:10', hora_fin: '21:00', niveles: ['Amarillo', 'Naranja'] }
 ];
 
-const alumnos = [
-  { id: 1, nombre: 'Juan', apellido: 'Pérez', cinturon: 'Amarillo', turnos: [2, 6, 11] },
-  { id: 2, nombre: 'María', apellido: 'González', cinturon: 'Verde', turnos: [4, 8] },
-  { id: 3, nombre: 'Carlos', apellido: 'Rodríguez', cinturon: 'Blanco', turnos: [1, 5, 9] },
-  { id: 4, nombre: 'Ana', apellido: 'Martínez', cinturon: 'Azul', turnos: [4, 8] }
-];
+// Datos mock comentados (no utilizados)
+// const alumnosMock = [...]
 
 const TurnosTab: React.FC = () => {
+  const [alumnos, setAlumnos] = useState<any[]>([]);
   const [selectedTurno, setSelectedTurno] = useState<any>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [openAsignarDialog, setOpenAsignarDialog] = useState(false);
   const [selectedAlumno, setSelectedAlumno] = useState('');
-  const [selectedTurnoId, setSelectedTurnoId] = useState('');
+  const [selectedTurnoIds, setSelectedTurnoIds] = useState<number[]>([]);
+  
+  // Cargar alumnos desde localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('alumnos-krav-maga');
+    const alumnosLocal = saved ? JSON.parse(saved) : [];
+    
+    // Agregar campo turnos si no existe (para compatibilidad)
+    const alumnosConTurnos = alumnosLocal.map((alumno: any) => ({
+      ...alumno,
+      cinturon: alumno.cinturon || 'Blanco', // Cinturón por defecto
+      turnos: alumno.turnos || [] // Array vacío si no tiene turnos
+    }));
+    
+    setAlumnos(alumnosConTurnos);
+  }, []);
 
   const handleVerAlumnos = (turno: any) => {
     setSelectedTurno(turno);
@@ -42,8 +55,29 @@ const TurnosTab: React.FC = () => {
   };
 
   const handleAsignarAlumno = () => {
-    alert(`Alumno asignado al turno exitosamente`);
+    if (!selectedAlumno || selectedTurnoIds.length === 0) {
+      alert('Por favor selecciona un alumno y al menos un turno');
+      return;
+    }
+    
+    // Actualizar alumnos con los nuevos turnos
+    const nuevosAlumnos = alumnos.map(alumno => 
+      alumno.id === Number(selectedAlumno)
+        ? { ...alumno, turnos: Array.from(new Set([...(alumno.turnos || []), ...selectedTurnoIds])) }
+        : alumno
+    );
+    
+    setAlumnos(nuevosAlumnos);
+    
+    // Guardar en localStorage
+    localStorage.setItem('alumnos-krav-maga', JSON.stringify(nuevosAlumnos));
+    
+    const alumnoNombre = alumnos.find(a => a.id === Number(selectedAlumno));
+    alert(`✅ ${alumnoNombre?.nombre} asignado a ${selectedTurnoIds.length} turno(s) exitosamente`);
+    
     setOpenAsignarDialog(false);
+    setSelectedAlumno('');
+    setSelectedTurnoIds([]);
   };
 
   const getAlumnosPorTurno = (turnoId: number) => {
@@ -182,7 +216,10 @@ const TurnosTab: React.FC = () => {
                 <Select
                   value={selectedAlumno}
                   label="Alumno"
-                  onChange={(e) => setSelectedAlumno(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedAlumno(e.target.value);
+                    setSelectedTurnoIds([]); // Limpiar turnos seleccionados al cambiar alumno
+                  }}
                 >
                   {alumnos.map((alumno) => (
                     <MenuItem key={alumno.id} value={alumno.id}>
@@ -194,17 +231,29 @@ const TurnosTab: React.FC = () => {
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel>Turno</InputLabel>
+                <InputLabel>Turnos (múltiple)</InputLabel>
                 <Select
-                  value={selectedTurnoId}
-                  label="Turno"
-                  onChange={(e) => setSelectedTurnoId(e.target.value)}
+                  multiple
+                  value={selectedTurnoIds}
+                  label="Turnos (múltiple)"
+                  onChange={(e) => setSelectedTurnoIds(e.target.value as number[])}
+                  renderValue={(selected) => {
+                    const selectedTurnos = turnosOrdenados.filter(t => selected.includes(t.id));
+                    return selectedTurnos.map(t => `${t.dia} ${t.hora_inicio}-${t.hora_fin}`).join(', ');
+                  }}
                 >
-                  {turnosOrdenados.map((turno) => (
-                    <MenuItem key={turno.id} value={turno.id}>
-                      {`${turno.dia} ${turno.hora_inicio}-${turno.hora_fin} (${turno.niveles.join(', ')})`}
-                    </MenuItem>
-                  ))}
+                  {turnosOrdenados
+                    .filter((turno) => {
+                      if (!selectedAlumno) return true; // Mostrar todos si no hay alumno seleccionado
+                      const alumno = alumnos.find(a => a.id === Number(selectedAlumno));
+                      return alumno ? turno.niveles.includes(alumno.cinturon) : true;
+                    })
+                    .map((turno) => (
+                      <MenuItem key={turno.id} value={turno.id}>
+                        {`${turno.dia} ${turno.hora_inicio}-${turno.hora_fin} (${turno.niveles.join(', ')})`}
+                      </MenuItem>
+                    ))
+                  }
                 </Select>
               </FormControl>
             </Grid>

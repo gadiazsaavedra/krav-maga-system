@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// import AlumnoTableRow from './AlumnoTableRow'; // Removido para evitar error
+import AlumnoTableRow from './AlumnoTableRow';
 import {
   Box, Typography, TextField, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Paper, Checkbox,
@@ -7,6 +7,8 @@ import {
   Grid, Chip
 } from '@mui/material';
 import { CheckCircle, Cancel, Warning } from '@mui/icons-material';
+
+
 
 const RenovacionesTab: React.FC = () => {
   const [selectedAño, setSelectedAño] = useState(2025);
@@ -47,18 +49,70 @@ const RenovacionesTab: React.FC = () => {
     });
     
     setRenovaciones(renovacionesCompletas);
-  }, []);
+  };
 
   // Guardar renovaciones en localStorage
   const saveRenovaciones = (renovaciones: any[]) => {
     localStorage.setItem('renovaciones-krav-maga', JSON.stringify(renovaciones));
   };
 
-    // Función no utilizada - comentada para eliminar warning
-  // const oldFetchRenovaciones = () => {
-  //   const renovacionesMock = [...]
-  //   setRenovaciones(renovacionesMock);
-  // };
+  const oldFetchRenovaciones = () => {
+    const renovacionesMock = [
+      {
+        id: 1,
+        nombre: 'Juan',
+        apellido: 'Pérez',
+        pago_realizado: true,
+        formulario_entregado: true,
+        apto_fisico_entregado: true,
+        fecha_pago: '2025-01-15',
+        monto: 25000
+      },
+      {
+        id: 2,
+        nombre: 'María',
+        apellido: 'González',
+        pago_realizado: true,
+        formulario_entregado: true,
+        apto_fisico_entregado: false,
+        fecha_pago: '2025-01-10',
+        monto: 25000
+      },
+      {
+        id: 3,
+        nombre: 'Carlos',
+        apellido: 'Rodríguez',
+        pago_realizado: true,
+        formulario_entregado: false,
+        apto_fisico_entregado: false,
+        fecha_pago: '2025-01-08',
+        monto: 25000
+      },
+      {
+        id: 4,
+        nombre: 'Ana',
+        apellido: 'López',
+        pago_realizado: false,
+        formulario_entregado: false,
+        apto_fisico_entregado: false,
+        fecha_pago: null,
+        monto: null
+      },
+      {
+        id: 5,
+        nombre: 'Pedro',
+        apellido: 'Martín',
+        pago_realizado: false,
+        formulario_entregado: true,
+        apto_fisico_entregado: false,
+        fecha_pago: null,
+        monto: null
+      }
+    ];
+    
+    // Esta función ya no se usa
+    // setRenovaciones(renovacionesMock);
+  };
 
   useEffect(() => {
     fetchRenovaciones();
@@ -214,7 +268,7 @@ const RenovacionesTab: React.FC = () => {
       }}>
         <Table>
           <TableHead>
-            <TableRow sx={{ backgroundColor: '#e3f2fd' }}>
+            <AlumnoTableRow isHeader>
               <TableCell>Alumno</TableCell>
               <TableCell align="center">Pago</TableCell>
               <TableCell align="center">Formulario</TableCell>
@@ -222,7 +276,7 @@ const RenovacionesTab: React.FC = () => {
               <TableCell>Estado</TableCell>
               <TableCell>Fecha Pago</TableCell>
               <TableCell>Monto</TableCell>
-            </TableRow>
+            </AlumnoTableRow>
           </TableHead>
           <TableBody>
             {renovaciones.map((renovacion) => {

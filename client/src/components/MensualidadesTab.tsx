@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
-import { useAppContext } from '../context/AppContext';
+import React, { useState, useMemo } from 'react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import AlumnoTableRow from './AlumnoTableRow';
 import {
   Box, Typography, Grid, Card, CardContent, Button, Dialog,
@@ -12,22 +11,9 @@ import {
 import { Payment, CheckCircle, Cancel, AttachMoney, Warning } from '@mui/icons-material';
 
 const MensualidadesTab: React.FC = () => {
-  // Cargar alumnos desde localStorage (mismo que AlumnosTab)
-  const [alumnosLocal, setAlumnosLocal] = useState(() => {
-    const saved = localStorage.getItem('alumnos-krav-maga');
-    return saved ? JSON.parse(saved) : [];
-  });
-  
-  // Sistema de pagos local con localStorage
-  const [pagosLocal, setPagosLocal] = useState(() => {
-    const saved = localStorage.getItem('pagos-krav-maga');
-    return saved ? JSON.parse(saved) : [];
-  });
-  
-  // Guardar pagos en localStorage
-  useEffect(() => {
-    localStorage.setItem('pagos-krav-maga', JSON.stringify(pagosLocal));
-  }, [pagosLocal]);
+  // Hook personalizado para localStorage
+  const [alumnosLocal] = useLocalStorage<any[]>('alumnos-krav-maga', []);
+  const [pagosLocal, setPagosLocal] = useLocalStorage<any[]>('pagos-krav-maga', []);
   const alumnos = alumnosLocal; // Usar alumnos de localStorage
   
   // Generar pagos desde alumnos locales
@@ -59,18 +45,10 @@ const MensualidadesTab: React.FC = () => {
   const [selectedAño, setSelectedAño] = useState(2025);
   const [pagoRapidoOpen, setPagoRapidoOpen] = useState(false);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any>(null);
-  const [tarifas, setTarifas] = useState<{id: number, nombre: string, valor: number, descripcion: string}[]>(() => {
-    const saved = localStorage.getItem('tarifas-krav-maga');
-    return saved ? JSON.parse(saved) : [
-      { id: 1, nombre: 'regular', valor: 58000, descripcion: 'Tarifa mensual regular' },
-      { id: 2, nombre: 'nueva', valor: 64000, descripcion: 'Tarifa para alumnos nuevos o reincorporación' }
-    ];
-  });
-  
-  // Guardar tarifas en localStorage
-  useEffect(() => {
-    localStorage.setItem('tarifas-krav-maga', JSON.stringify(tarifas));
-  }, [tarifas]);
+  const [tarifas, setTarifas] = useLocalStorage<{id: number, nombre: string, valor: number, descripcion: string}[]>('tarifas-krav-maga', [
+    { id: 1, nombre: 'regular', valor: 58000, descripcion: 'Tarifa mensual regular' },
+    { id: 2, nombre: 'nueva', valor: 64000, descripcion: 'Tarifa para alumnos nuevos o reincorporación' }
+  ]);
   const [tarifasOpen, setTarifasOpen] = useState(false);
   const [editandoTarifa, setEditandoTarifa] = useState<{id: number, valor: number} | null>(null);
   const [formData, setFormData] = useState({

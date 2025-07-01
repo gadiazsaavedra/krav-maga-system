@@ -7,10 +7,9 @@ import {
 } from '@mui/material';
 import AlumnoTableRow from './AlumnoTableRow';
 import LoadingSpinner from './LoadingSpinner';
-import DemoMessage from './DemoMessage';
 import { useFormValidation } from '../hooks/useFormValidation';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import { alumnoSchema } from '../utils/validationSchemas';
-import { useCreateAlumno, useUpdateAlumno, useDeleteAlumno } from '../hooks/useAlumnos';
 import { mockAlumnos } from '../data/mockData';
 import { Add, Edit } from '@mui/icons-material';
 
@@ -58,22 +57,40 @@ const AlumnosTab: React.FC = () => {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<OrderBy>('apellido');
   
-  // Estado local para alumnos con persistencia
-  const [alumnosLocal, setAlumnosLocal] = useState(() => {
-    const saved = localStorage.getItem('alumnos-krav-maga');
-    return saved ? JSON.parse(saved) : mockAlumnos;
-  });
+  // Hook personalizado para localStorage
+  const [alumnosLocal, setAlumnosLocal] = useLocalStorage('alumnos-krav-maga', mockAlumnos);
   
-  // Guardar en localStorage cuando cambie el estado
-  React.useEffect(() => {
-    localStorage.setItem('alumnos-krav-maga', JSON.stringify(alumnosLocal));
+  // Calcular inasistencias desde asistencias registradas
+  const calcularInasistencias = (alumnoId: number) => {
+    const saved = localStorage.getItem('asistencias-krav-maga');
+    const asistencias = saved ? JSON.parse(saved) : [];
+    
+    // Filtrar asistencias del alumno en los últimos 30 días
+    const hace30Dias = new Date();
+    hace30Dias.setDate(hace30Dias.getDate() - 30);
+    
+    const asistenciasAlumno = asistencias.filter((a: any) => 
+      a.alumno_id === alumnoId && 
+      new Date(a.fecha) >= hace30Dias
+    );
+    
+    // Contar inasistencias (presente = false)
+    return asistenciasAlumno.filter((a: any) => !a.presente).length;
+  };
+  
+  // Alumnos con inasistencias calculadas
+  const alumnosConInasistencias = React.useMemo(() => {
+    return alumnosLocal.map((alumno: any) => ({
+      ...alumno,
+      inasistencias_recientes: calcularInasistencias(alumno.id)
+    }));
   }, [alumnosLocal]);
-  const alumnosData = { data: alumnosLocal, total: alumnosLocal.length };
+  const alumnosData = { data: alumnosConInasistencias, total: alumnosConInasistencias.length };
   const isLoading = false;
   const error = null;
   // const { data: alumnosData, isLoading, error } = useAlumnos(page, rowsPerPage, orderBy, order);
   // const createAlumnoMutation = useCreateAlumno();
-  const updateAlumnoMutation = useUpdateAlumno();
+  // const updateAlumnoMutation = useUpdateAlumno(); // No usado
   // const deleteAlumnoMutation = useDeleteAlumno();
   const [editingAlumno, setEditingAlumno] = useState<Alumno | null>(null);
   const initialFormData = {
@@ -156,7 +173,7 @@ const AlumnosTab: React.FC = () => {
         }
       }
     });
-  }, [alumnos, order, orderBy]);
+  }, [alumnos, order, orderBy, ordenCinturones]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -175,17 +192,32 @@ const AlumnosTab: React.FC = () => {
     }
     
     if (editingAlumno) {
+      // Mapear grupo a turnos
+      const mapearGrupoATurnos = (grupo: string): number[] => {
+        const mapeo: { [key: string]: number[] } = {
+          'Lunes y Miércoles 17:00-18:00': [1, 5],
+          'Lunes y Miércoles 18:00-19:00': [2, 6],
+          'Lunes y Miércoles 19:00-20:00': [3, 7],
+          'Lunes y Miércoles 20:00-21:00': [4, 8],
+          'Martes y Jueves 13:00-14:00': [9, 10],
+          'Viernes 17:30-19:10': [11],
+          'Viernes 19:10-21:00': [12]
+        };
+        return mapeo[grupo] || [];
+      };
+      
       // Actualizar alumno existente
       const alumnoActualizado = {
         ...editingAlumno,
         ...formData,
+        turnos: mapearGrupoATurnos(formData.grupo), // Actualizar turnos basados en grupo
         activo: editingAlumno.activo || 1,
         // Asegurar que fecha_registro se actualice
         fecha_registro: formData.fecha_registro || editingAlumno.fecha_registro
       };
       
       // Actualizar en estado local
-      setAlumnosLocal((prevAlumnos: Alumno[]) => {
+      setAlumnosLocal((prevAlumnos: any[]) => {
         const index = prevAlumnos.findIndex(a => a.id === editingAlumno.id);
         if (index !== -1) {
           const nuevosAlumnos = [...prevAlumnos];
@@ -197,18 +229,32 @@ const AlumnosTab: React.FC = () => {
       
       alert('✅ Alumno actualizado exitosamente');
     } else {
+      // Mapear grupo a turnos
+      const mapearGrupoATurnos = (grupo: string): number[] => {
+        const mapeo: { [key: string]: number[] } = {
+          'Lunes y Miércoles 17:00-18:00': [1, 5],
+          'Lunes y Miércoles 18:00-19:00': [2, 6],
+          'Lunes y Miércoles 19:00-20:00': [3, 7],
+          'Lunes y Miércoles 20:00-21:00': [4, 8],
+          'Martes y Jueves 13:00-14:00': [9, 10],
+          'Viernes 17:30-19:10': [11],
+          'Viernes 19:10-21:00': [12]
+        };
+        return mapeo[grupo] || [];
+      };
+      
       // Crear nuevo alumno
       const nuevoAlumno = {
-        id: Math.max(...alumnosLocal.map((a: Alumno) => a.id)) + 1,
+        id: Math.max(...alumnosLocal.map((a: any) => a.id)) + 1,
         ...formData,
         fecha_registro: formData.fecha_registro,
-
+        turnos: mapearGrupoATurnos(formData.grupo), // Agregar turnos basados en grupo
         activo: 1,
         inasistencias_recientes: 0
       };
       
       // Agregar a estado local
-      setAlumnosLocal((prevAlumnos: Alumno[]) => [...prevAlumnos, nuevoAlumno as any]);
+      setAlumnosLocal((prevAlumnos: any[]) => [...prevAlumnos, nuevoAlumno as any]);
       
 
       alert('✅ Alumno creado exitosamente');
@@ -635,7 +681,7 @@ const AlumnosTab: React.FC = () => {
               onClick={() => {
                 if (window.confirm(`¿Eliminar a ${editingAlumno.nombre} ${editingAlumno.apellido}?`)) {
                   // Eliminar del estado local
-                  setAlumnosLocal((prevAlumnos: Alumno[]) => 
+                  setAlumnosLocal((prevAlumnos: any[]) => 
                     prevAlumnos.filter(alumno => alumno.id !== editingAlumno.id)
                   );
                   handleClose();
