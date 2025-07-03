@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, AppBar, Toolbar, Typography, Container, Tabs, Tab, Box } from '@mui/material';
+import { CssBaseline, AppBar, Toolbar, Typography, Container, Box, BottomNavigation, BottomNavigationAction, Menu, MenuItem } from '@mui/material';
+import { People, Payment, Store, MoreVert, School, Schedule, CheckCircle, Person } from '@mui/icons-material';
 // import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 // import 'dayjs/locale/es';
@@ -91,10 +92,24 @@ function TabPanel(props: TabPanelProps) {
 
 function App() {
   const [tabValue, setTabValue] = useState(0);
+  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(null);
   const totalTabs = 8;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+  };
+
+  const handleMoreClick = (event: React.SyntheticEvent) => {
+    setMoreMenuAnchor(event.currentTarget as HTMLElement);
+  };
+
+  const handleMoreClose = () => {
+    setMoreMenuAnchor(null);
+  };
+
+  const handleMoreItemClick = (tabIndex: number) => {
+    setTabValue(tabIndex);
+    handleMoreClose();
   };
 
   // Gestos de swipe para cambiar tabs
@@ -132,31 +147,7 @@ function App() {
           </Toolbar>
         </AppBar>
         
-        <Container sx={{ mt: 1, px: { xs: 1, sm: 2 } }} {...swipeHandlers}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs 
-              value={tabValue} 
-              onChange={handleTabChange} 
-              variant="scrollable" 
-              scrollButtons="auto"
-              sx={{
-                '& .MuiTab-root': {
-                  minWidth: { xs: 80, sm: 120 },
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                  padding: { xs: '6px 8px', sm: '12px 16px' }
-                }
-              }}
-            >
-              <Tab label="Alumnos" />
-              <Tab label="Pagos" />
-              <Tab label="Tienda" />
-              <Tab label="Renovaciones" />
-              <Tab label="Exámenes" />
-              <Tab label="Turnos" />
-              <Tab label="Asistencias" />
-              <Tab label="Instructor" />
-            </Tabs>
-          </Box>
+        <Container sx={{ mt: 1, px: { xs: 1, sm: 2 }, pb: { xs: 10, sm: 2 } }} {...swipeHandlers}>
           
           <TabPanel value={tabValue} index={0}>
             <Suspense fallback={<LoadingSpinner />}>
@@ -199,6 +190,93 @@ function App() {
             </Suspense>
           </TabPanel>
         </Container>
+        
+        {/* Bottom Navigation - Mobile First */}
+        <BottomNavigation
+          value={tabValue > 3 ? 3 : tabValue}
+          onChange={(event, newValue) => {
+            if (newValue === 3) {
+              handleMoreClick(event);
+            } else {
+              setTabValue(newValue);
+            }
+          }}
+          sx={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+            borderTop: 1,
+            borderColor: 'divider',
+            '& .MuiBottomNavigationAction-root': {
+              minWidth: 'auto',
+              '&.Mui-selected': {
+                color: 'primary.main'
+              }
+            }
+          }}
+        >
+          <BottomNavigationAction
+            label="Alumnos"
+            icon={<People />}
+          />
+          <BottomNavigationAction
+            label="Pagos"
+            icon={<Payment />}
+          />
+          <BottomNavigationAction
+            label="Tienda"
+            icon={<Store />}
+          />
+          <BottomNavigationAction
+            label="Más"
+            icon={<MoreVert />}
+          />
+        </BottomNavigation>
+
+        {/* Menú desplegable para opciones adicionales */}
+        <Menu
+          anchorEl={moreMenuAnchor}
+          open={Boolean(moreMenuAnchor)}
+          onClose={handleMoreClose}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          sx={{
+            '& .MuiPaper-root': {
+              minWidth: 200,
+              borderRadius: 2
+            }
+          }}
+        >
+          <MenuItem onClick={() => handleMoreItemClick(3)} selected={tabValue === 3}>
+            <School sx={{ mr: 2 }} />
+            Renovaciones
+          </MenuItem>
+          <MenuItem onClick={() => handleMoreItemClick(4)} selected={tabValue === 4}>
+            <School sx={{ mr: 2 }} />
+            Exámenes
+          </MenuItem>
+          <MenuItem onClick={() => handleMoreItemClick(5)} selected={tabValue === 5}>
+            <Schedule sx={{ mr: 2 }} />
+            Turnos
+          </MenuItem>
+          <MenuItem onClick={() => handleMoreItemClick(6)} selected={tabValue === 6}>
+            <CheckCircle sx={{ mr: 2 }} />
+            Asistencias
+          </MenuItem>
+          <MenuItem onClick={() => handleMoreItemClick(7)} selected={tabValue === 7}>
+            <Person sx={{ mr: 2 }} />
+            Instructor
+          </MenuItem>
+        </Menu>
+        
         </ThemeProvider>
       </AppProvider>
   );

@@ -31,7 +31,13 @@ const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   }, [value]);
 
   const handleInputChange = (newValue: string) => {
-    const formattedValue = formatter ? formatter(newValue) : newValue;
+    let formattedValue = formatter ? formatter(newValue) : newValue;
+    
+    // Capitalizar primera letra para nombres y apellidos
+    if (label === 'Nombre' || label === 'Apellido') {
+      formattedValue = formattedValue.charAt(0).toUpperCase() + formattedValue.slice(1).toLowerCase();
+    }
+    
     setInputValue(formattedValue);
     onChange(formattedValue);
   };

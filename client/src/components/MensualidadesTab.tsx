@@ -6,9 +6,9 @@ import {
   DialogTitle, DialogContent, DialogActions, TextField, Select,
   MenuItem, FormControl, InputLabel, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Paper, Chip, Autocomplete,
-  IconButton, Tooltip
+  IconButton, Tooltip, Fab, Divider
 } from '@mui/material';
-import { Payment, CheckCircle, Cancel, AttachMoney, Warning } from '@mui/icons-material';
+import { Payment, CheckCircle, Cancel, AttachMoney, Warning, Add, Phone } from '@mui/icons-material';
 
 const MensualidadesTab: React.FC = () => {
   // Hook personalizado para localStorage
@@ -332,130 +332,127 @@ const MensualidadesTab: React.FC = () => {
         </Grid>
       </Grid>
 
-      <TableContainer component={Paper} sx={{
-        overflowX: 'auto',
-        borderRadius: 3,
-        boxShadow: 3,
-        '& .MuiTable-root': {
-          minWidth: { xs: 800, sm: 'auto' },
-          tableLayout: 'fixed',
-          width: '100%'
-        },
-        '& .MuiTableHead-root': {
-          backgroundColor: '#e3f2fd'
-        },
-        '& .MuiTableCell-head, & .MuiTableCell-body': {
-          padding: '12px 16px !important',
-          textAlign: 'left',
-          verticalAlign: 'middle',
-          borderRight: '1px solid #e0e0e0',
-          wordWrap: 'break-word',
-          overflow: 'hidden'
-        },
-        '& .MuiTableCell-head': {
-          color: 'black',
-          fontWeight: 700,
-          fontSize: { xs: '0.8rem', sm: '0.9rem' },
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          backgroundColor: '#e3f2fd !important'
-        },
-        '& .MuiTableRow-root:nth-of-type(even)': {
-          backgroundColor: 'grey.50'
-        },
-        '& .MuiTableRow-root:hover': {
-          backgroundColor: 'grey.100'
-        }
-      }}>
-        <Table>
-          <colgroup>
-            <col style={{ width: '18%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '14%' }} />
-            <col style={{ width: '14%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '18%' }} />
-          </colgroup>
-          <TableHead>
-            <AlumnoTableRow isHeader>
-              <TableCell>Alumno</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Fecha Límite</TableCell>
-              <TableCell>Fecha Pago</TableCell>
-              <TableCell>Monto</TableCell>
-              <TableCell>Método</TableCell>
-              <TableCell align="center">Acciones</TableCell>
-            </AlumnoTableRow>
-          </TableHead>
-          <TableBody>
-            {pagosOrdenados.map((pago) => (
-              <TableRow 
-                key={pago.id}
-                sx={{
-                  backgroundColor: pago.dias_atraso > 90 ? '#ffebee' : 
-                                  pago.dias_atraso > 0 ? '#fff3e0' : 'inherit'
-                }}
-              >
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, overflow: 'hidden' }}>
+      {/* Cards Mobile-First */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {pagosOrdenados.map((pago) => (
+          <Card 
+            key={pago.id}
+            sx={{ 
+              borderRadius: 3,
+              boxShadow: 2,
+              borderLeft: `4px solid ${
+                pago.estado === 'Pagado' ? '#4caf50' :
+                pago.dias_atraso > 90 ? '#f44336' :
+                pago.dias_atraso > 0 ? '#ff9800' : '#2196f3'
+              }`,
+              '&:hover': {
+                boxShadow: 4,
+                transform: 'translateY(-2px)'
+              },
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <CardContent sx={{ pb: 1 }}>
+              {/* Header con nombre y estado */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                <Box sx={{ flex: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     {pago.dias_atraso > 90 && <Warning color="error" fontSize="small" />}
-                    <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {`${pago.apellido}, ${pago.nombre}`}
+                    <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+                      {pago.apellido}, {pago.nombre}
                     </Typography>
                   </Box>
-                </TableCell>
-                <TableCell>
                   <Chip
                     icon={pago.estado === 'Pagado' ? <CheckCircle /> : <Cancel />}
                     label={getEstadoTexto(pago)}
                     color={getEstadoColor(pago)}
-                    size="small"
+                    size="medium"
+                    sx={{ fontWeight: 600 }}
                   />
-                </TableCell>
-                <TableCell>
+                </Box>
+                
+                {/* Botón de acción principal */}
+                {pago.estado === 'Pendiente' && (
+                  <Button
+                    variant="contained"
+                    color="success"
+                    startIcon={<AttachMoney />}
+                    onClick={() => handlePagoRapido(pago)}
+                    sx={{
+                      minHeight: 48,
+                      minWidth: 120,
+                      borderRadius: 3,
+                      fontWeight: 600
+                    }}
+                  >
+                    Pagar
+                  </Button>
+                )}
+              </Box>
+
+              {/* Información detallada */}
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Fecha Límite:
+                  </Typography>
                   <Typography 
                     variant="body2" 
-                    color={pago.dias_atraso > 0 ? 'error' : 'textSecondary'}
-                    noWrap
+                    color={pago.dias_atraso > 0 ? 'error.main' : 'text.primary'}
+                    fontWeight={pago.dias_atraso > 0 ? 600 : 400}
                   >
                     {new Date(pago.fecha_limite).toLocaleDateString()}
                   </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
-                    {pago.fecha_pago ? new Date(pago.fecha_pago).toLocaleDateString() : '-'}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
-                    {pago.monto ? `$${pago.monto.toLocaleString()}` : '-'}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
-                    {pago.metodo_pago || '-'}
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  {pago.estado === 'Pendiente' && (
-                    <Tooltip title="Registrar pago rápido">
-                      <IconButton 
-                        color="primary" 
-                        size="small"
-                        onClick={() => handlePagoRapido(pago)}
-                      >
-                        <AttachMoney />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                </Box>
+                
+                {pago.estado === 'Pagado' && (
+                  <>
+                    <Divider />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Fecha Pago:
+                      </Typography>
+                      <Typography variant="body2">
+                        {pago.fecha_pago ? new Date(pago.fecha_pago).toLocaleDateString() : '-'}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Monto:
+                      </Typography>
+                      <Typography variant="body1" fontWeight={600} color="success.main">
+                        {pago.monto ? `$${pago.monto.toLocaleString()}` : '-'}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Método:
+                      </Typography>
+                      <Typography variant="body2">
+                        {pago.metodo_pago || '-'}
+                      </Typography>
+                    </Box>
+                  </>
+                )}
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
+      
+      {/* Floating Action Button */}
+      <Fab
+        color="primary"
+        onClick={() => setOpen(true)}
+        sx={{
+          position: 'fixed',
+          bottom: { xs: 80, sm: 16 },
+          right: 16,
+          zIndex: 1000
+        }}
+      >
+        <Add />
+      </Fab>
 
       {/* Dialog para registro de pago completo */}
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>

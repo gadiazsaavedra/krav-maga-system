@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import {
   Box, Button, Dialog, DialogTitle, DialogContent, DialogActions,
-  TextField, Grid, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, IconButton, Chip, Typography, TableSortLabel,
-  TablePagination, Alert, MenuItem
+  TextField, Grid, Paper, IconButton, Chip, Typography,
+  TablePagination, Alert, MenuItem, Card, CardContent, CardActions,
+  Collapse, Divider, Fab, InputAdornment, Stepper, Step, StepLabel,
+  MobileStepper
 } from '@mui/material';
+import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material';
+import { ExpandMore, Phone, Email, Search, Clear, Edit as EditIcon, Call } from '@mui/icons-material';
 import AlumnoTableRow from './AlumnoTableRow';
 import LoadingSpinner from './LoadingSpinner';
 import { useFormValidation } from '../hooks/useFormValidation';
@@ -106,6 +109,11 @@ const AlumnosTab: React.FC = () => {
   // const deleteAlumnoMutation = useDeleteAlumno();
   const [editingAlumno, setEditingAlumno] = useState<Alumno | null>(null);
   const [modoProgresivo, setModoProgresivo] = useState(false);
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [swipedCard, setSwipedCard] = useState<number | null>(null);
+  const [activeStep, setActiveStep] = useState(0);
+  const maxSteps = 3;
   const initialFormData = {
     nombre: '',
     apellido: '',
@@ -156,11 +164,25 @@ const AlumnosTab: React.FC = () => {
   // Orden jerárquico de cinturones
   const ordenCinturones = ['Blanco', 'Amarillo', 'Naranja', 'Verde', 'Azul', 'Marrón', 'Negro'];
   
-  // Ordenar alumnos localmente
+  // Filtrar y ordenar alumnos
   const alumnosOrdenados = React.useMemo(() => {
     if (!alumnos || alumnos.length === 0) return [];
     
-    return [...alumnos].sort((a, b) => {
+    // Filtrar por término de búsqueda
+    const alumnosFiltrados = alumnos.filter((alumno: any) => {
+      if (!searchTerm) return true;
+      const termino = searchTerm.toLowerCase();
+      return (
+        alumno.nombre?.toLowerCase().includes(termino) ||
+        alumno.apellido?.toLowerCase().includes(termino) ||
+        alumno.telefono?.includes(termino) ||
+        alumno.email?.toLowerCase().includes(termino) ||
+        alumno.cinturon?.toLowerCase().includes(termino)
+      );
+    });
+    
+    // Ordenar resultados filtrados
+    return [...alumnosFiltrados].sort((a, b) => {
       if (orderBy === 'cinturon') {
         const aIndex = ordenCinturones.indexOf(a.cinturon || 'Blanco');
         const bIndex = ordenCinturones.indexOf(b.cinturon || 'Blanco');
@@ -189,7 +211,7 @@ const AlumnosTab: React.FC = () => {
         }
       }
     });
-  }, [alumnos, order, orderBy, ordenCinturones]);
+  }, [alumnos, order, orderBy, ordenCinturones, searchTerm]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -283,8 +305,17 @@ const AlumnosTab: React.FC = () => {
   const handleClose = () => {
     setOpen(false);
     setEditingAlumno(null);
+    setActiveStep(0);
     reset();
     setTurnosDisponibles(turnosPorCinturon['Blanco']);
+  };
+
+  const handleNext = () => {
+    setActiveStep((prevStep) => prevStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevStep) => prevStep - 1);
   };
 
   const handleRefresh = async () => {
@@ -379,31 +410,33 @@ const AlumnosTab: React.FC = () => {
         <Typography variant="h4" component="h1" sx={{ 
           fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
           fontWeight: 600,
-          color: 'primary.main',
-          mb: { xs: 1, sm: 0 }
+          color: 'primary.main'
         }}>
           🥋 Alumnos
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => setOpen(true)}
-          size="large"
-          sx={{ 
-            minHeight: { xs: 56, sm: 48 },
-            fontSize: { xs: '1rem', sm: '1rem' },
-            borderRadius: 3,
-            textTransform: 'none',
-            fontWeight: 600,
-            boxShadow: 3,
-            '&:hover': {
-              boxShadow: 6,
-              transform: 'translateY(-1px)'
-            }
+        
+        {/* Search Bar */}
+        <TextField
+          placeholder="Buscar alumnos..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          size="small"
+          sx={{ width: '100%', mt: 2 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+            endAdornment: searchTerm && (
+              <InputAdornment position="end">
+                <IconButton size="small" onClick={() => setSearchTerm('')}>
+                  <Clear />
+                </IconButton>
+              </InputAdornment>
+            )
           }}
-        >
-          Nuevo Alumno
-        </Button>
+        />
       </Box>
       
       {error && (
@@ -415,82 +448,231 @@ const AlumnosTab: React.FC = () => {
       {isLoading && <LoadingSpinner message="Cargando alumnos..." />}
 
       <PullToRefresh onRefresh={handleRefresh}>
-        <TableContainer component={Paper} sx={{ 
-        overflowX: 'auto',
-        borderRadius: 3,
-        boxShadow: 3
-      }}>
-        <Table sx={{ 
-          tableLayout: 'fixed',
-          width: '100%',
-          '& .MuiTableHead-root': {
-            backgroundColor: '#e3f2fd'
-          },
-          '& .MuiTableCell-head': {
-            fontWeight: 'bold',
-            color: 'black',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            textAlign: 'center'
-          }
-        }}>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Nombre</TableCell>
-              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Apellido</TableCell>
-              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Teléfono</TableCell>
-              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Email</TableCell>
-              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Turno</TableCell>
-              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Grado</TableCell>
-              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Registro</TableCell>
-              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Faltas</TableCell>
-              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {!isLoading && alumnosOrdenados.map((alumno: any) => (
-                <TableRow key={alumno.id}>
-                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>{alumno.nombre}</TableCell>
-                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>{alumno.apellido}</TableCell>
-                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>{alumno.telefono}</TableCell>
-                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>{alumno.email}</TableCell>
-                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>{alumno.grupo}</TableCell>
-                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>
-                    <Chip
-                      label={alumno.cinturon}
-                      size="small"
-                      sx={{
-                        backgroundColor: getCinturonColor(alumno.cinturon),
-                        color: alumno.cinturon === 'Blanco' ? 'black' : 'white'
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>
-                    {alumno.fecha_registro || 'Sin fecha'}
-                  </TableCell>
-                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>
-                    <Chip 
-                      label={(alumno as any).inasistencias_recientes || 0} 
-                      color={(alumno as any).inasistencias_recientes > 3 ? "error" : "success"}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleEdit(alumno)}
-                      color="primary"
-                    >
-                      <Edit />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {!isLoading && alumnosOrdenados.map((alumno: any) => (
+            <Box
+              key={alumno.id}
+              sx={{ position: 'relative', overflow: 'hidden', borderRadius: 3 }}
+              onTouchStart={(e) => {
+                const touch = e.touches[0];
+                (e.currentTarget as any).startX = touch.clientX;
+                (e.currentTarget as any).startY = touch.clientY;
+              }}
+              onTouchMove={(e) => {
+                const touch = e.touches[0];
+                const element = e.currentTarget as any;
+                const deltaX = touch.clientX - element.startX;
+                const deltaY = touch.clientY - element.startY;
+                
+                // Solo swipe horizontal
+                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
+                  e.preventDefault();
+                  const card = element.querySelector('.swipe-card');
+                  if (card) {
+                    card.style.transform = `translateX(${deltaX}px)`;
+                    
+                    // Mostrar acciones
+                    if (deltaX > 80) {
+                      setSwipedCard(alumno.id);
+                    } else if (deltaX < -80) {
+                      setSwipedCard(alumno.id);
+                    }
+                  }
+                }
+              }}
+              onTouchEnd={(e) => {
+                const element = e.currentTarget as any;
+                const card = element.querySelector('.swipe-card');
+                if (card) {
+                  const transform = card.style.transform;
+                  const translateX = transform ? parseInt(transform.match(/-?\d+/)?.[0] || '0') : 0;
+                  
+                  if (Math.abs(translateX) > 80) {
+                    // Ejecutar acción
+                    if (translateX > 0) {
+                      // Swipe right → Llamar
+                      window.open(`tel:${alumno.telefono}`, '_self');
+                    } else {
+                      // Swipe left → Editar
+                      handleEdit(alumno);
+                    }
+                  }
+                  
+                  // Reset posición
+                  card.style.transform = 'translateX(0px)';
+                  card.style.transition = 'transform 0.3s ease';
+                  setTimeout(() => {
+                    card.style.transition = '';
+                    setSwipedCard(null);
+                  }, 300);
+                }
+              }}
+            >
+              {/* Acciones de fondo */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  zIndex: 1
+                }}
+              >
+                {/* Acción izquierda - Llamar */}
+                <Box
+                  sx={{
+                    flex: 1,
+                    backgroundColor: 'success.main',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    pl: 3,
+                    color: 'white'
+                  }}
+                >
+                  <Call sx={{ mr: 1 }} />
+                  <Typography variant="body2" fontWeight="bold">Llamar</Typography>
+                </Box>
+                
+                {/* Acción derecha - Editar */}
+                <Box
+                  sx={{
+                    flex: 1,
+                    backgroundColor: 'primary.main',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    pr: 3,
+                    color: 'white'
+                  }}
+                >
+                  <Typography variant="body2" fontWeight="bold">Editar</Typography>
+                  <EditIcon sx={{ ml: 1 }} />
+                </Box>
+              </Box>
+              
+              <Card 
+                className="swipe-card"
+                sx={{ 
+                  borderRadius: 3,
+                  boxShadow: 2,
+                  position: 'relative',
+                  zIndex: 2,
+                  backgroundColor: 'white',
+                  '&:hover': {
+                    boxShadow: 4,
+                    transform: 'translateY(-2px)'
+                  },
+                  transition: 'box-shadow 0.2s ease, transform 0.2s ease'
+                }}
+              >
+              <CardContent sx={{ pb: 1 }}>
+                {/* Información principal */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+                      {alumno.nombre} {alumno.apellido}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                      <Chip
+                        label={alumno.cinturon}
+                        size="small"
+                        sx={{
+                          backgroundColor: getCinturonColor(alumno.cinturon),
+                          color: alumno.cinturon === 'Blanco' ? 'black' : 'white',
+                          fontWeight: 600
+                        }}
+                      />
+                      <Chip 
+                        label={`${(alumno as any).inasistencias_recientes || 0} faltas`}
+                        color={(alumno as any).inasistencias_recientes > 3 ? "error" : "success"}
+                        size="small"
+                      />
+                    </Box>
+                  </Box>
+                  <IconButton 
+                    onClick={() => handleEdit(alumno)}
+                    sx={{
+                      backgroundColor: 'primary.main',
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: 'primary.dark',
+                        transform: 'scale(1.1)'
+                      },
+                      minWidth: 48,
+                      minHeight: 48
+                    }}
+                  >
+                    <Edit />
+                  </IconButton>
+                </Box>
+
+                {/* Acciones rápidas */}
+                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                  <Button
+                    startIcon={<Phone />}
+                    variant="outlined"
+                    size="small"
+                    href={`tel:${alumno.telefono}`}
+                    sx={{ flex: 1, minHeight: 44 }}
+                  >
+                    {alumno.telefono}
+                  </Button>
+                  <IconButton
+                    onClick={() => setExpandedCard(expandedCard === alumno.id ? null : alumno.id)}
+                    sx={{
+                      transform: expandedCard === alumno.id ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s',
+                      minWidth: 44,
+                      minHeight: 44
+                    }}
+                  >
+                    <ExpandMore />
+                  </IconButton>
+                </Box>
+
+                {/* Información expandible */}
+                <Collapse in={expandedCard === alumno.id}>
+                  <Divider sx={{ mb: 2 }} />
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Email fontSize="small" color="action" />
+                      <Typography variant="body2" color="text.secondary">
+                        {alumno.email || 'Sin email'}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">Turno:</Typography>
+                      <Typography variant="body2">{alumno.grupo || 'Sin turno'}</Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">Registro:</Typography>
+                      <Typography variant="body2">{alumno.fecha_registro || 'Sin fecha'}</Typography>
+                    </Box>
+                  </Box>
+                </Collapse>
+              </CardContent>
+            </Card>
+            </Box>
+          ))}
+        </Box>
       </PullToRefresh>
+      
+      {/* Floating Action Button */}
+      <Fab
+        color="primary"
+        onClick={() => setOpen(true)}
+        sx={{
+          position: 'fixed',
+          bottom: { xs: 80, sm: 16 },
+          right: 16,
+          zIndex: 1000
+        }}
+      >
+        <Add />
+      </Fab>
       
       <TablePagination
         component="div"
@@ -530,155 +712,168 @@ const AlumnosTab: React.FC = () => {
         }}>
           {editingAlumno ? '✏️ Editar Alumno' : '➕ Nuevo Alumno'}
         </DialogTitle>
-        <DialogContent sx={{ p: { xs: 3, sm: 3 } }}>
-          <Grid container spacing={{ xs: 3, sm: 2 }} sx={{ mt: 1 }}>
-            <Grid item xs={12} sm={6}>
-              <AutocompleteField
-                label="Nombre"
-                value={formData.nombre}
-                onChange={(value) => setValue('nombre', value)}
-                suggestions={nombresExistentes}
-                error={!!errors.nombre}
-                helperText={errors.nombre}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <AutocompleteField
-                label="Apellido"
-                value={formData.apellido}
-                onChange={(value) => setValue('apellido', value)}
-                suggestions={apellidosExistentes}
-                error={!!errors.apellido}
-                helperText={errors.apellido}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <AutocompleteField
-                label="Teléfono"
-                value={formData.telefono}
-                onChange={(value) => setValue('telefono', value)}
-                suggestions={[]}
-                type="tel"
-                inputMode="tel"
-                error={!!errors.telefono}
-                helperText={errors.telefono}
-                formatter={formatTelefono}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <AutocompleteField
-                label="Email"
-                value={formData.email}
-                onChange={(value) => setValue('email', value)}
-                suggestions={sugerenciasEmail}
-                type="email"
-                inputMode="email"
-                error={!!errors.email}
-                helperText={errors.email}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FechaSelector
-                label="Fecha de Nacimiento"
-                value={formData.fecha_nacimiento}
-                onChange={(value) => setValue('fecha_nacimiento', value)}
-                error={!!errors.fecha_nacimiento}
-                helperText={errors.fecha_nacimiento}
-                max={new Date().toISOString().split('T')[0]}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FechaSelector
-                label="Fecha de Registro"
-                value={formData.fecha_registro}
-                onChange={(value) => setValue('fecha_registro', value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                select
-                label="Turno"
-                value={formData.grupo}
-                onChange={(e) => setValue('grupo', e.target.value)}
-              >
-                {turnosDisponibles.map((turno) => (
-                  <MenuItem key={turno} value={turno}>
-                    {turno}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12}>
-              <CinturonSelector
-                value={formData.cinturon}
-                onChange={(nuevoCinturon) => {
-                  const turnosParaCinturon = turnosPorCinturon[nuevoCinturon as keyof typeof turnosPorCinturon] || [];
-                  setTurnosDisponibles(turnosParaCinturon);
-                  setValue('cinturon', nuevoCinturon);
-                  setValue('grupo', turnosParaCinturon.length > 0 ? turnosParaCinturon[0] : '');
-                }}
-                label="Cinturón"
-              />
-            </Grid>
-          </Grid>
+        <DialogContent sx={{ p: { xs: 2, sm: 3 }, minHeight: 400 }}>
+          {/* Mobile Stepper */}
+          <MobileStepper
+            steps={maxSteps}
+            position="static"
+            activeStep={activeStep}
+            sx={{ mb: 3, backgroundColor: 'transparent' }}
+            nextButton={<div />}
+            backButton={<div />}
+          />
+          
+          {/* Paso 1: Datos Básicos */}
+          {activeStep === 0 && (
+            <Box sx={{ py: 2 }}>
+              <Typography variant="h6" sx={{ mb: 3, textAlign: 'center', color: 'primary.main' }}>
+                👤 Datos Básicos
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <AutocompleteField
+                    label="Nombre"
+                    value={formData.nombre}
+                    onChange={(value) => setValue('nombre', value)}
+                    suggestions={nombresExistentes}
+                    error={!!errors.nombre}
+                    helperText={errors.nombre}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <AutocompleteField
+                    label="Apellido"
+                    value={formData.apellido}
+                    onChange={(value) => setValue('apellido', value)}
+                    suggestions={apellidosExistentes}
+                    error={!!errors.apellido}
+                    helperText={errors.apellido}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FechaSelector
+                    label="Fecha de Nacimiento"
+                    value={formData.fecha_nacimiento}
+                    onChange={(value) => setValue('fecha_nacimiento', value)}
+                    error={!!errors.fecha_nacimiento}
+                    helperText={errors.fecha_nacimiento}
+                    max={new Date().toISOString().split('T')[0]}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+          
+          {/* Paso 2: Contacto */}
+          {activeStep === 1 && (
+            <Box sx={{ py: 2 }}>
+              <Typography variant="h6" sx={{ mb: 3, textAlign: 'center', color: 'primary.main' }}>
+                📞 Contacto
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <AutocompleteField
+                    label="Teléfono"
+                    value={formData.telefono}
+                    onChange={(value) => setValue('telefono', value)}
+                    suggestions={[]}
+                    type="tel"
+                    inputMode="tel"
+                    error={!!errors.telefono}
+                    helperText={errors.telefono}
+                    formatter={formatTelefono}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <AutocompleteField
+                    label="Email"
+                    value={formData.email}
+                    onChange={(value) => setValue('email', value)}
+                    suggestions={sugerenciasEmail}
+                    type="email"
+                    inputMode="email"
+                    error={!!errors.email}
+                    helperText={errors.email}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FechaSelector
+                    label="Fecha de Registro"
+                    value={formData.fecha_registro}
+                    onChange={(value) => setValue('fecha_registro', value)}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+          
+          {/* Paso 3: Krav Maga */}
+          {activeStep === 2 && (
+            <Box sx={{ py: 2 }}>
+              <Typography variant="h6" sx={{ mb: 3, textAlign: 'center', color: 'primary.main' }}>
+                🥋 Krav Maga
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <CinturonSelector
+                    value={formData.cinturon}
+                    onChange={(nuevoCinturon) => {
+                      const turnosParaCinturon = turnosPorCinturon[nuevoCinturon as keyof typeof turnosPorCinturon] || [];
+                      setTurnosDisponibles(turnosParaCinturon);
+                      setValue('cinturon', nuevoCinturon);
+                      setValue('grupo', turnosParaCinturon.length > 0 ? turnosParaCinturon[0] : '');
+                    }}
+                    label="Cinturón"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    select
+                    label="Turno"
+                    value={formData.grupo}
+                    onChange={(e) => setValue('grupo', e.target.value)}
+                    size="medium"
+                  >
+                    {turnosDisponibles.map((turno) => (
+                      <MenuItem key={turno} value={turno}>
+                        {turno}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+              </Grid>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions sx={{ 
-          justifyContent: editingAlumno ? 'space-between' : 'flex-end',
-          p: { xs: 3, sm: 2 },
-          gap: 2,
-          flexDirection: { xs: 'column', sm: 'row' }
+          justifyContent: 'space-between',
+          p: { xs: 2, sm: 2 },
+          gap: 1
         }}>
-          {editingAlumno && (
-            <Button 
-              onClick={() => {
-                if (window.confirm(`¿Eliminar a ${editingAlumno.nombre} ${editingAlumno.apellido}?`)) {
-                  // Eliminar del estado local
-                  setAlumnosLocal((prevAlumnos: any[]) => 
-                    prevAlumnos.filter(alumno => alumno.id !== editingAlumno.id)
-                  );
-                  handleClose();
-                  alert('✅ Alumno eliminado exitosamente');
-                }
-              }}
-              color="error"
-              variant="outlined"
-            >
-              Eliminar
-            </Button>
-          )}
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 2, 
-            width: { xs: '100%', sm: 'auto' },
-            flexDirection: { xs: 'column', sm: 'row' }
-          }}>
-            <Button 
-              onClick={handleClose} 
-              size="large"
-              sx={{ 
-                minHeight: 48,
-                textTransform: 'none',
-                fontWeight: 600
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleSubmit} 
-              variant="contained"
-              size="large"
-              sx={{
-                minHeight: 48,
-                textTransform: 'none',
-                fontWeight: 600,
-                borderRadius: 3,
-                boxShadow: 3
-              }}
-            >
-              {editingAlumno ? '✅ Actualizar' : '➕ Crear'}
-            </Button>
-          </Box>
+          {/* Botón Atrás */}
+          <Button
+            onClick={activeStep === 0 ? handleClose : handleBack}
+            startIcon={activeStep === 0 ? undefined : <KeyboardArrowLeft />}
+            sx={{ minHeight: 48, minWidth: 100 }}
+          >
+            {activeStep === 0 ? 'Cancelar' : 'Atrás'}
+          </Button>
+          
+          {/* Indicador de paso */}
+          <Typography variant="body2" color="text.secondary">
+            {activeStep + 1} de {maxSteps}
+          </Typography>
+          
+          {/* Botón Siguiente/Guardar */}
+          <Button
+            onClick={activeStep === maxSteps - 1 ? handleSubmit : handleNext}
+            endIcon={activeStep === maxSteps - 1 ? undefined : <KeyboardArrowRight />}
+            variant="contained"
+            sx={{ minHeight: 48, minWidth: 100 }}
+          >
+            {activeStep === maxSteps - 1 ? (editingAlumno ? 'Actualizar' : 'Crear') : 'Siguiente'}
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
