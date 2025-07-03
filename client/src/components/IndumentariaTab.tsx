@@ -421,6 +421,11 @@ const IndumentariaTab: React.FC = () => {
         overflowX: 'auto',
         borderRadius: 3,
         boxShadow: 3,
+        '& .MuiTable-root': {
+          minWidth: { xs: 800, sm: 'auto' },
+          tableLayout: 'fixed',
+          width: '100%'
+        },
         '& .MuiTableHead-root': {
           backgroundColor: 'primary.dark',
           '& .MuiTableCell-head': {
@@ -428,8 +433,20 @@ const IndumentariaTab: React.FC = () => {
             fontWeight: 700,
             fontSize: { xs: '0.8rem', sm: '0.9rem' },
             textShadow: '1px 1px 2px rgba(255,255,255,0.5)',
-            letterSpacing: '0.5px'
+            letterSpacing: '0.5px',
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+            backgroundColor: 'primary.dark !important'
           }
+        },
+        '& .MuiTableCell-head, & .MuiTableCell-body': {
+          padding: '12px 16px !important',
+          textAlign: 'left',
+          verticalAlign: 'middle',
+          borderRight: '1px solid #e0e0e0',
+          wordWrap: 'break-word',
+          overflow: 'hidden'
         },
         '& .MuiTableRow-root:nth-of-type(even)': {
           backgroundColor: 'grey.50'
@@ -439,6 +456,16 @@ const IndumentariaTab: React.FC = () => {
         }
       }}>
         <Table>
+          <colgroup>
+            <col style={{ width: '18%' }} />
+            <col style={{ width: '15%' }} />
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '17%' }} />
+          </colgroup>
           <TableHead>
             <AlumnoTableRow isHeader>
               <TableCell>
@@ -480,31 +507,55 @@ const IndumentariaTab: React.FC = () => {
                   Fecha Pedido
                 </TableSortLabel>
               </TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell align="center">Acciones</TableCell>
             </AlumnoTableRow>
           </TableHead>
           <TableBody>
             {pedidosOrdenados.map((pedido) => (
               <TableRow key={pedido.id}>
-                <TableCell>{`${pedido.apellido}, ${pedido.nombre}`}</TableCell>
-                <TableCell>{pedido.tipo}</TableCell>
-                <TableCell>{pedido.talle}</TableCell>
-                <TableCell>{pedido.cantidad}</TableCell>
-                <TableCell>${pedido.monto?.toLocaleString()}</TableCell>
+                <TableCell>
+                  <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {`${pedido.apellido}, ${pedido.nombre}`}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2" noWrap>
+                    {pedido.tipo}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2" noWrap>
+                    {pedido.talle}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2" noWrap>
+                    {pedido.cantidad}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2" noWrap>
+                    ${pedido.monto?.toLocaleString()}
+                  </Typography>
+                </TableCell>
                 <TableCell>
                   <Chip
                     label={pedido.estado}
                     color={getEstadoColor(pedido.estado) as any}
+                    size="small"
                   />
                 </TableCell>
                 <TableCell>
-                  {new Date(pedido.fecha_pedido).toLocaleDateString()}
+                  <Typography variant="body2" noWrap>
+                    {new Date(pedido.fecha_pedido).toLocaleDateString()}
+                  </Typography>
                 </TableCell>
-                <TableCell>
+                <TableCell align="center">
                   <Select
                     size="small"
                     value={pedido.estado}
                     onChange={(e) => handleEstadoChange(pedido.id, e.target.value)}
+                    sx={{ minWidth: 120 }}
                   >
                     <MenuItem value="Pedido">Pedido</MenuItem>
                     <MenuItem value="Recibido en Club">Recibido en Club</MenuItem>

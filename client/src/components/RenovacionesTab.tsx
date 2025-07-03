@@ -7,6 +7,7 @@ import {
   Grid, Chip
 } from '@mui/material';
 import { CheckCircle, Cancel, Warning } from '@mui/icons-material';
+import ToggleSwitch from './ToggleSwitch';
 
 const RenovacionesTab: React.FC = () => {
   const [selectedAño, setSelectedAño] = useState(2025);
@@ -150,6 +151,7 @@ const RenovacionesTab: React.FC = () => {
             type="number"
             value={selectedAño}
             onChange={(e) => setSelectedAño(Number(e.target.value))}
+            inputProps={{ inputMode: 'numeric' }}
             sx={{ width: 120 }}
           />
           <Button variant="outlined" onClick={fetchRenovaciones}>
@@ -195,6 +197,11 @@ const RenovacionesTab: React.FC = () => {
         overflowX: 'auto',
         borderRadius: 3,
         boxShadow: 3,
+        '& .MuiTable-root': {
+          minWidth: { xs: 800, sm: 'auto' },
+          tableLayout: 'fixed',
+          width: '100%'
+        },
         '& .MuiTableHead-root': {
           backgroundColor: 'primary.dark',
           '& .MuiTableCell-head': {
@@ -202,8 +209,20 @@ const RenovacionesTab: React.FC = () => {
             fontWeight: 700,
             fontSize: { xs: '0.8rem', sm: '0.9rem' },
             textShadow: '1px 1px 2px rgba(255,255,255,0.5)',
-            letterSpacing: '0.5px'
+            letterSpacing: '0.5px',
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+            backgroundColor: 'primary.dark !important'
           }
+        },
+        '& .MuiTableCell-head, & .MuiTableCell-body': {
+          padding: '12px 16px !important',
+          textAlign: 'left',
+          verticalAlign: 'middle',
+          borderRight: '1px solid #e0e0e0',
+          wordWrap: 'break-word',
+          overflow: 'hidden'
         },
         '& .MuiTableRow-root:nth-of-type(even)': {
           backgroundColor: 'grey.50'
@@ -213,6 +232,15 @@ const RenovacionesTab: React.FC = () => {
         }
       }}>
         <Table>
+          <colgroup>
+            <col style={{ width: '20%' }} />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '16%' }} />
+            <col style={{ width: '15%' }} />
+            <col style={{ width: '15%' }} />
+          </colgroup>
           <TableHead>
             <TableRow sx={{ backgroundColor: '#e3f2fd' }}>
               <TableCell>Alumno</TableCell>
@@ -229,29 +257,42 @@ const RenovacionesTab: React.FC = () => {
               const estado = getEstadoRenovacion(renovacion);
               return (
                 <TableRow key={renovacion.id}>
-                  <TableCell>{`${renovacion.apellido}, ${renovacion.nombre}`}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {`${renovacion.apellido}, ${renovacion.nombre}`}
+                    </Typography>
+                  </TableCell>
                   <TableCell align="center">
-                    <Checkbox
+                    <ToggleSwitch
                       checked={renovacion.pago_realizado}
-                      onChange={(e) => {
-                        if (e.target.checked) {
+                      onChange={(checked) => {
+                        if (checked) {
                           handlePagoClick(renovacion);
                         } else {
                           handleCheckboxChange(renovacion.id, 'pago_realizado', false);
                         }
                       }}
+                      label="Pago"
+                      size="small"
+                      color="success"
                     />
                   </TableCell>
                   <TableCell align="center">
-                    <Checkbox
+                    <ToggleSwitch
                       checked={renovacion.formulario_entregado}
-                      onChange={(e) => handleCheckboxChange(renovacion.id, 'formulario_entregado', e.target.checked)}
+                      onChange={(checked) => handleCheckboxChange(renovacion.id, 'formulario_entregado', checked)}
+                      label="Formulario"
+                      size="small"
+                      color="primary"
                     />
                   </TableCell>
                   <TableCell align="center">
-                    <Checkbox
+                    <ToggleSwitch
                       checked={renovacion.apto_fisico_entregado}
-                      onChange={(e) => handleCheckboxChange(renovacion.id, 'apto_fisico_entregado', e.target.checked)}
+                      onChange={(checked) => handleCheckboxChange(renovacion.id, 'apto_fisico_entregado', checked)}
+                      label="Apto Físico"
+                      size="small"
+                      color="warning"
                     />
                   </TableCell>
                   <TableCell>
@@ -259,13 +300,18 @@ const RenovacionesTab: React.FC = () => {
                       icon={estado.icon}
                       label={estado.label}
                       color={estado.color as any}
+                      size="small"
                     />
                   </TableCell>
                   <TableCell>
-                    {renovacion.fecha_pago ? new Date(renovacion.fecha_pago).toLocaleDateString() : '-'}
+                    <Typography variant="body2" noWrap>
+                      {renovacion.fecha_pago ? new Date(renovacion.fecha_pago).toLocaleDateString() : '-'}
+                    </Typography>
                   </TableCell>
                   <TableCell>
-                    {renovacion.monto ? `$${renovacion.monto.toLocaleString()}` : '-'}
+                    <Typography variant="body2" noWrap>
+                      {renovacion.monto ? `$${renovacion.monto.toLocaleString()}` : '-'}
+                    </Typography>
                   </TableCell>
                 </TableRow>
               );
@@ -286,6 +332,7 @@ const RenovacionesTab: React.FC = () => {
             type="number"
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
+            inputProps={{ inputMode: 'numeric' }}
             sx={{ mt: 2 }}
           />
         </DialogContent>

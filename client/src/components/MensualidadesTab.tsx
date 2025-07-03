@@ -332,8 +332,52 @@ const MensualidadesTab: React.FC = () => {
         </Grid>
       </Grid>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{
+        overflowX: 'auto',
+        borderRadius: 3,
+        boxShadow: 3,
+        '& .MuiTable-root': {
+          minWidth: { xs: 800, sm: 'auto' },
+          tableLayout: 'fixed',
+          width: '100%'
+        },
+        '& .MuiTableHead-root': {
+          backgroundColor: '#e3f2fd'
+        },
+        '& .MuiTableCell-head, & .MuiTableCell-body': {
+          padding: '12px 16px !important',
+          textAlign: 'left',
+          verticalAlign: 'middle',
+          borderRight: '1px solid #e0e0e0',
+          wordWrap: 'break-word',
+          overflow: 'hidden'
+        },
+        '& .MuiTableCell-head': {
+          color: 'black',
+          fontWeight: 700,
+          fontSize: { xs: '0.8rem', sm: '0.9rem' },
+          position: 'sticky',
+          top: 0,
+          zIndex: 1,
+          backgroundColor: '#e3f2fd !important'
+        },
+        '& .MuiTableRow-root:nth-of-type(even)': {
+          backgroundColor: 'grey.50'
+        },
+        '& .MuiTableRow-root:hover': {
+          backgroundColor: 'grey.100'
+        }
+      }}>
         <Table>
+          <colgroup>
+            <col style={{ width: '18%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '18%' }} />
+          </colgroup>
           <TableHead>
             <AlumnoTableRow isHeader>
               <TableCell>Alumno</TableCell>
@@ -342,7 +386,7 @@ const MensualidadesTab: React.FC = () => {
               <TableCell>Fecha Pago</TableCell>
               <TableCell>Monto</TableCell>
               <TableCell>Método</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell align="center">Acciones</TableCell>
             </AlumnoTableRow>
           </TableHead>
           <TableBody>
@@ -355,9 +399,11 @@ const MensualidadesTab: React.FC = () => {
                 }}
               >
                 <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, overflow: 'hidden' }}>
                     {pago.dias_atraso > 90 && <Warning color="error" fontSize="small" />}
-                    {`${pago.apellido}, ${pago.nombre}`}
+                    <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {`${pago.apellido}, ${pago.nombre}`}
+                    </Typography>
                   </Box>
                 </TableCell>
                 <TableCell>
@@ -372,18 +418,27 @@ const MensualidadesTab: React.FC = () => {
                   <Typography 
                     variant="body2" 
                     color={pago.dias_atraso > 0 ? 'error' : 'textSecondary'}
+                    noWrap
                   >
                     {new Date(pago.fecha_limite).toLocaleDateString()}
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  {pago.fecha_pago ? new Date(pago.fecha_pago).toLocaleDateString() : '-'}
+                  <Typography variant="body2" noWrap>
+                    {pago.fecha_pago ? new Date(pago.fecha_pago).toLocaleDateString() : '-'}
+                  </Typography>
                 </TableCell>
                 <TableCell>
-                  {pago.monto ? `$${pago.monto.toLocaleString()}` : '-'}
+                  <Typography variant="body2" noWrap>
+                    {pago.monto ? `$${pago.monto.toLocaleString()}` : '-'}
+                  </Typography>
                 </TableCell>
-                <TableCell>{pago.metodo_pago || '-'}</TableCell>
                 <TableCell>
+                  <Typography variant="body2" noWrap>
+                    {pago.metodo_pago || '-'}
+                  </Typography>
+                </TableCell>
+                <TableCell align="center">
                   {pago.estado === 'Pendiente' && (
                     <Tooltip title="Registrar pago rápido">
                       <IconButton 

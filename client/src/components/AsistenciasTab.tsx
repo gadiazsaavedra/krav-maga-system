@@ -367,8 +367,48 @@ const AsistenciasTab: React.FC = () => {
         </Box>
       )}
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{
+        overflowX: 'auto',
+        borderRadius: 3,
+        boxShadow: 3,
+        '& .MuiTable-root': {
+          minWidth: { xs: 600, sm: 'auto' },
+          tableLayout: 'fixed',
+          width: '100%'
+        },
+        '& .MuiTableHead-root': {
+          backgroundColor: '#e3f2fd'
+        },
+        '& .MuiTableCell-head, & .MuiTableCell-body': {
+          padding: '12px 16px !important',
+          textAlign: 'left',
+          verticalAlign: 'middle',
+          borderRight: '1px solid #e0e0e0',
+          wordWrap: 'break-word',
+          overflow: 'hidden'
+        },
+        '& .MuiTableCell-head': {
+          color: 'black',
+          fontWeight: 700,
+          fontSize: { xs: '0.8rem', sm: '0.9rem' },
+          position: 'sticky',
+          top: 0,
+          zIndex: 1,
+          backgroundColor: '#e3f2fd !important'
+        },
+        '& .MuiTableRow-root:nth-of-type(even)': {
+          backgroundColor: 'grey.50'
+        },
+        '& .MuiTableRow-root:hover': {
+          backgroundColor: 'grey.100'
+        }
+      }}>
         <Table>
+          <colgroup>
+            <col style={{ width: '50%' }} />
+            <col style={{ width: '25%' }} />
+            <col style={{ width: '25%' }} />
+          </colgroup>
           <TableHead>
             <AlumnoTableRow isHeader>
               <TableCell>Alumno</TableCell>
@@ -395,7 +435,11 @@ const AsistenciasTab: React.FC = () => {
               
               return (
                 <TableRow key={alumno.id}>
-                  <TableCell>{`${alumno.apellido}, ${alumno.nombre}`}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {`${alumno.apellido}, ${alumno.nombre}`}
+                    </Typography>
+                  </TableCell>
                   <TableCell align="center">
                     <Checkbox
                       icon={<Cancel />}

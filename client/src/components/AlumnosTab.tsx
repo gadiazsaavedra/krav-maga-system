@@ -10,6 +10,14 @@ import LoadingSpinner from './LoadingSpinner';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { alumnoSchema } from '../utils/validationSchemas';
+import AutocompleteField from './AutocompleteField';
+import CinturonSelector from './CinturonSelector';
+import TurnoSelector from './TurnoSelector';
+import FechaSelector from './FechaSelector';
+import AlumnoFormProgresivo from './AlumnoFormProgresivo';
+import { formatTelefono, getSugerenciasEmail, callesComunes } from '../utils/formatters';
+import PullToRefresh from './PullToRefresh';
+import LongPressMenu from './LongPressMenu';
 import { mockAlumnos } from '../data/mockData';
 import { Add, Edit } from '@mui/icons-material';
 
@@ -41,10 +49,10 @@ type OrderBy = 'nombre' | 'apellido' | 'cinturon';
 const cinturones = ['Blanco', 'Amarillo', 'Naranja', 'Verde', 'Azul', 'Marrón', 'Negro'];
 // Mapeo de turnos disponibles por cinturón
 const turnosPorCinturon = {
-  'Blanco': ['Lunes y Miércoles 17:00-18:00', 'Lunes y Miércoles 19:00-20:00', 'Martes y Jueves 13:00-14:00', 'Viernes 17:30-19:10'],
-  'Amarillo': ['Lunes y Miércoles 18:00-19:00', 'Martes y Jueves 13:00-14:00', 'Viernes 19:10-21:00'],
-  'Naranja': ['Lunes y Miércoles 20:00-21:00', 'Viernes 19:10-21:00'],
-  'Verde': ['Lunes y Miércoles 20:00-21:00'],
+  'Blanco': ['Lun y Mie 17:00-18:00', 'Lun y Mie 19:00-20:00', 'Mar y Jue 13:00-14:00', 'Vie 17:30-19:10'],
+  'Amarillo': ['Lun y Mie 18:00-19:00', 'Mar y Jue 13:00-14:00', 'Vie 19:10-21:00'],
+  'Naranja': ['Lun y Mie 20:00-21:00', 'Vie 19:10-21:00'],
+  'Verde': ['Lun y Mie 20:00-21:00'],
   'Azul': [],
   'Marrón': [],
   'Negro': []
@@ -85,6 +93,10 @@ const AlumnosTab: React.FC = () => {
       inasistencias_recientes: calcularInasistencias(alumno.id)
     }));
   }, [alumnosLocal]);
+
+  // Sugerencias para autocompletado
+  const nombresExistentes = Array.from(new Set(alumnosLocal.map((a: any) => a.nombre))).filter(Boolean);
+  const apellidosExistentes = Array.from(new Set(alumnosLocal.map((a: any) => a.apellido))).filter(Boolean);
   const alumnosData = { data: alumnosConInasistencias, total: alumnosConInasistencias.length };
   const isLoading = false;
   const error = null;
@@ -93,6 +105,7 @@ const AlumnosTab: React.FC = () => {
   // const updateAlumnoMutation = useUpdateAlumno(); // No usado
   // const deleteAlumnoMutation = useDeleteAlumno();
   const [editingAlumno, setEditingAlumno] = useState<Alumno | null>(null);
+  const [modoProgresivo, setModoProgresivo] = useState(false);
   const initialFormData = {
     nombre: '',
     apellido: '',
@@ -106,7 +119,7 @@ const AlumnosTab: React.FC = () => {
       const day = String(today.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
     })(), // Fecha local sin UTC
-    grupo: 'Lunes y Miércoles 17:00-18:00',
+    grupo: 'Lun y Mie 17:00-18:00',
     cinturon: 'Blanco'
   };
   
@@ -122,6 +135,9 @@ const AlumnosTab: React.FC = () => {
     schema: alumnoSchema,
     initialValues: initialFormData
   });
+
+  // Sugerencias de email (después de formData)
+  const sugerenciasEmail = getSugerenciasEmail(formData.email);
   
   // Turnos disponibles basados en el cinturón seleccionado
   const [turnosDisponibles, setTurnosDisponibles] = useState<string[]>(turnosPorCinturon['Blanco']);
@@ -195,13 +211,13 @@ const AlumnosTab: React.FC = () => {
       // Mapear grupo a turnos
       const mapearGrupoATurnos = (grupo: string): number[] => {
         const mapeo: { [key: string]: number[] } = {
-          'Lunes y Miércoles 17:00-18:00': [1, 5],
-          'Lunes y Miércoles 18:00-19:00': [2, 6],
-          'Lunes y Miércoles 19:00-20:00': [3, 7],
-          'Lunes y Miércoles 20:00-21:00': [4, 8],
-          'Martes y Jueves 13:00-14:00': [9, 10],
-          'Viernes 17:30-19:10': [11],
-          'Viernes 19:10-21:00': [12]
+          'Lun y Mie 17:00-18:00': [1, 5],
+          'Lun y Mie 18:00-19:00': [2, 6],
+          'Lun y Mie 19:00-20:00': [3, 7],
+          'Lun y Mie 20:00-21:00': [4, 8],
+          'Mar y Jue 13:00-14:00': [9, 10],
+          'Vie 17:30-19:10': [11],
+          'Vie 19:10-21:00': [12]
         };
         return mapeo[grupo] || [];
       };
@@ -232,13 +248,13 @@ const AlumnosTab: React.FC = () => {
       // Mapear grupo a turnos
       const mapearGrupoATurnos = (grupo: string): number[] => {
         const mapeo: { [key: string]: number[] } = {
-          'Lunes y Miércoles 17:00-18:00': [1, 5],
-          'Lunes y Miércoles 18:00-19:00': [2, 6],
-          'Lunes y Miércoles 19:00-20:00': [3, 7],
-          'Lunes y Miércoles 20:00-21:00': [4, 8],
-          'Martes y Jueves 13:00-14:00': [9, 10],
-          'Viernes 17:30-19:10': [11],
-          'Viernes 19:10-21:00': [12]
+          'Lun y Mie 17:00-18:00': [1, 5],
+          'Lun y Mie 18:00-19:00': [2, 6],
+          'Lun y Mie 19:00-20:00': [3, 7],
+          'Lun y Mie 20:00-21:00': [4, 8],
+          'Mar y Jue 13:00-14:00': [9, 10],
+          'Vie 17:30-19:10': [11],
+          'Vie 19:10-21:00': [12]
         };
         return mapeo[grupo] || [];
       };
@@ -269,6 +285,12 @@ const AlumnosTab: React.FC = () => {
     setEditingAlumno(null);
     reset();
     setTurnosDisponibles(turnosPorCinturon['Blanco']);
+  };
+
+  const handleRefresh = async () => {
+    // Simular actualización de datos
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Aquí podrías recargar datos del servidor
   };
 
   const handleEdit = (alumno: any) => {
@@ -322,6 +344,26 @@ const AlumnosTab: React.FC = () => {
     return colors[cinturon] || '#ffffff';
   };
 
+  // Renderizar formulario progresivo si está activo
+  if (modoProgresivo) {
+    return (
+      <AlumnoFormProgresivo
+        onGuardar={(alumno) => {
+          const nuevoAlumno = {
+            id: Math.max(...alumnosLocal.map((a: any) => a.id)) + 1,
+            ...alumno,
+            activo: 1,
+            inasistencias_recientes: 0
+          };
+          setAlumnosLocal((prev: any[]) => [...prev, nuevoAlumno]);
+          setModoProgresivo(false);
+          alert('✅ Alumno creado exitosamente');
+        }}
+        onCancelar={() => setModoProgresivo(false)}
+      />
+    );
+  }
+
   return (
     <Box>
       {/* <DemoMessage /> */}
@@ -360,7 +402,7 @@ const AlumnosTab: React.FC = () => {
             }
           }}
         >
-          Nuevo
+          Nuevo Alumno
         </Button>
       </Box>
       
@@ -372,142 +414,83 @@ const AlumnosTab: React.FC = () => {
       
       {isLoading && <LoadingSpinner message="Cargando alumnos..." />}
 
-      <TableContainer component={Paper} sx={{ 
+      <PullToRefresh onRefresh={handleRefresh}>
+        <TableContainer component={Paper} sx={{ 
         overflowX: 'auto',
         borderRadius: 3,
-        boxShadow: 3,
-        '& .MuiTable-root': {
-          minWidth: { xs: 600, sm: 'auto' }
-        },
-        '& .MuiTableHead-root': {
-          backgroundColor: 'primary.dark',
-          '& .MuiTableCell-head': {
-            color: 'black',
-            fontWeight: 700,
-            fontSize: { xs: '0.8rem', sm: '0.9rem' },
-            textShadow: '1px 1px 2px rgba(255,255,255,0.5)',
-            letterSpacing: '0.5px'
-          }
-        },
-        '& .MuiTableRow-root:nth-of-type(even)': {
-          backgroundColor: 'grey.50'
-        },
-        '& .MuiTableRow-root:hover': {
-          backgroundColor: 'grey.100'
-        }
+        boxShadow: 3
       }}>
-        <Table size="small">
+        <Table sx={{ 
+          tableLayout: 'fixed',
+          width: '100%',
+          '& .MuiTableHead-root': {
+            backgroundColor: '#e3f2fd'
+          },
+          '& .MuiTableCell-head': {
+            fontWeight: 'bold',
+            color: 'black',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            textAlign: 'center'
+          }
+        }}>
           <TableHead>
-            <AlumnoTableRow isHeader>
-              <TableCell sx={{ minWidth: 100 }}>
-                <TableSortLabel
-                  active={orderBy === 'nombre'}
-                  direction={orderBy === 'nombre' ? order : 'asc'}
-                  onClick={() => handleRequestSort('nombre')}
-                >
-                  Nombre
-                </TableSortLabel>
-              </TableCell>
-              <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                <TableSortLabel
-                  active={orderBy === 'apellido'}
-                  direction={orderBy === 'apellido' ? order : 'asc'}
-                  onClick={() => handleRequestSort('apellido')}
-                >
-                  Apellido
-                </TableSortLabel>
-              </TableCell>
-              <TableCell sx={{ minWidth: 100 }}>📱 Tel</TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Email</TableCell>
-              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>Turno</TableCell>
-              <TableCell sx={{ minWidth: 80 }}>
-                <TableSortLabel
-                  active={orderBy === 'cinturon'}
-                  direction={orderBy === 'cinturon' ? order : 'asc'}
-                  onClick={() => handleRequestSort('cinturon')}
-                >
-                  🥋 Grado
-                </TableSortLabel>
-              </TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Registro</TableCell>
-              <TableCell sx={{ minWidth: 60 }}>❌ Faltas</TableCell>
-              <TableCell sx={{ minWidth: 60 }}>⚙️</TableCell>
-            </AlumnoTableRow>
+            <TableRow>
+              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Nombre</TableCell>
+              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Apellido</TableCell>
+              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Teléfono</TableCell>
+              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Email</TableCell>
+              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Turno</TableCell>
+              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Grado</TableCell>
+              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Registro</TableCell>
+              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Faltas</TableCell>
+              <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box' }}>Acciones</TableCell>
+            </TableRow>
           </TableHead>
           <TableBody>
             {!isLoading && alumnosOrdenados.map((alumno: any) => (
-              <TableRow key={alumno.id}>
-                <TableCell>
-                  <Box>
-                    <Typography variant="body2" fontWeight="bold">
-                      {alumno.nombre}
-                    </Typography>
-                    <Typography variant="caption" sx={{ display: { xs: 'block', sm: 'none' } }}>
-                      {alumno.apellido}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                  {alumno.apellido}
-                </TableCell>
-                <TableCell>{alumno.telefono}</TableCell>
-                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                  {alumno.email}
-                </TableCell>
-                <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>
-                  <Typography variant="caption">
-                    {alumno.grupo}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={alumno.cinturon}
-                    sx={{
-                      backgroundColor: getCinturonColor(alumno.cinturon),
-                      color: alumno.cinturon === 'Blanco' ? 'black' : 'white'
-                    }}
-                  />
-                </TableCell>
-                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                  <Typography variant="caption">
-                    {alumno.fecha_registro || 'Sin fecha'}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  {(alumno as any).inasistencias_recientes ? (
-                    <Chip 
-                      label={(alumno as any).inasistencias_recientes} 
-                      color={(alumno as any).inasistencias_recientes > 3 ? "error" : "warning"}
+                <TableRow key={alumno.id}>
+                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>{alumno.nombre}</TableCell>
+                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>{alumno.apellido}</TableCell>
+                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>{alumno.telefono}</TableCell>
+                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>{alumno.email}</TableCell>
+                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>{alumno.grupo}</TableCell>
+                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>
+                    <Chip
+                      label={alumno.cinturon}
                       size="small"
-                      title="Inasistencias en los últimos 30 días"
+                      sx={{
+                        backgroundColor: getCinturonColor(alumno.cinturon),
+                        color: alumno.cinturon === 'Blanco' ? 'black' : 'white'
+                      }}
                     />
-                  ) : (
-                    <Chip label="0" color="success" size="small" title="Sin inasistencias recientes" />
-                  )}
-                </TableCell>
-                <TableCell>
-                  <IconButton 
-                    size="medium" 
-                    onClick={() => handleEdit(alumno)}
-                    sx={{
-                      backgroundColor: 'primary.main',
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: 'primary.dark',
-                        transform: 'scale(1.1)'
-                      },
-                      minWidth: { xs: 44, sm: 40 },
-                      minHeight: { xs: 44, sm: 40 }
-                    }}
-                  >
-                    <Edit fontSize="small" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
+                  </TableCell>
+                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>
+                    {alumno.fecha_registro || 'Sin fecha'}
+                  </TableCell>
+                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>
+                    <Chip 
+                      label={(alumno as any).inasistencias_recientes || 0} 
+                      color={(alumno as any).inasistencias_recientes > 3 ? "error" : "success"}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell sx={{ width: '140px !important', minWidth: '140px !important', maxWidth: '140px !important', padding: '8px !important', boxSizing: 'border-box', textAlign: 'center' }}>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handleEdit(alumno)}
+                      color="primary"
+                    >
+                      <Edit />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      </PullToRefresh>
       
       <TablePagination
         component="div"
@@ -550,86 +533,65 @@ const AlumnosTab: React.FC = () => {
         <DialogContent sx={{ p: { xs: 3, sm: 3 } }}>
           <Grid container spacing={{ xs: 3, sm: 2 }} sx={{ mt: 1 }}>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
+              <AutocompleteField
                 label="Nombre"
                 value={formData.nombre}
-                onChange={(e) => setValue('nombre', e.target.value)}
+                onChange={(value) => setValue('nombre', value)}
+                suggestions={nombresExistentes}
                 error={!!errors.nombre}
                 helperText={errors.nombre}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
+              <AutocompleteField
                 label="Apellido"
                 value={formData.apellido}
-                onChange={(e) => setValue('apellido', e.target.value)}
+                onChange={(value) => setValue('apellido', value)}
+                suggestions={apellidosExistentes}
                 error={!!errors.apellido}
                 helperText={errors.apellido}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
+              <AutocompleteField
                 label="Teléfono"
                 value={formData.telefono}
-                onChange={(e) => setValue('telefono', e.target.value)}
+                onChange={(value) => setValue('telefono', value)}
+                suggestions={[]}
+                type="tel"
+                inputMode="tel"
                 error={!!errors.telefono}
                 helperText={errors.telefono}
+                formatter={formatTelefono}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
+              <AutocompleteField
                 label="Email"
-                type="email"
                 value={formData.email}
-                onChange={(e) => setValue('email', e.target.value)}
+                onChange={(value) => setValue('email', value)}
+                suggestions={sugerenciasEmail}
+                type="email"
+                inputMode="email"
                 error={!!errors.email}
                 helperText={errors.email}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
+              <FechaSelector
                 label="Fecha de Nacimiento"
-                type="date"
                 value={formData.fecha_nacimiento}
-                onChange={(e) => setValue('fecha_nacimiento', e.target.value)}
+                onChange={(value) => setValue('fecha_nacimiento', value)}
                 error={!!errors.fecha_nacimiento}
                 helperText={errors.fecha_nacimiento}
-                InputLabelProps={{ shrink: true }}
-                sx={{
-                  '& .MuiInputBase-root': {
-                    minHeight: 56,
-                    height: 56
-                  },
-                  '& .MuiInputBase-input': {
-                    height: '1.4375em',
-                    padding: '16.5px 14px'
-                  }
-                }}
+                max={new Date().toISOString().split('T')[0]}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
+              <FechaSelector
                 label="Fecha de Registro"
-                type="date"
                 value={formData.fecha_registro}
-                onChange={(e) => setValue('fecha_registro', e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                sx={{
-                  '& .MuiInputBase-root': {
-                    minHeight: 56,
-                    height: 56
-                  },
-                  '& .MuiInputBase-input': {
-                    height: '1.4375em',
-                    padding: '16.5px 14px'
-                  }
-                }}
+                onChange={(value) => setValue('fecha_registro', value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -647,26 +609,17 @@ const AlumnosTab: React.FC = () => {
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                select
-                label="Cinturón"
+            <Grid item xs={12}>
+              <CinturonSelector
                 value={formData.cinturon}
-                onChange={(e) => {
-                  const nuevoCinturon = e.target.value;
+                onChange={(nuevoCinturon) => {
                   const turnosParaCinturon = turnosPorCinturon[nuevoCinturon as keyof typeof turnosPorCinturon] || [];
                   setTurnosDisponibles(turnosParaCinturon);
                   setValue('cinturon', nuevoCinturon);
                   setValue('grupo', turnosParaCinturon.length > 0 ? turnosParaCinturon[0] : '');
                 }}
-              >
-                {cinturones.map((cinturon) => (
-                  <MenuItem key={cinturon} value={cinturon}>
-                    {cinturon}
-                  </MenuItem>
-                ))}
-              </TextField>
+                label="Cinturón"
+              />
             </Grid>
           </Grid>
         </DialogContent>

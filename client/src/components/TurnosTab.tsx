@@ -121,38 +121,93 @@ const TurnosTab: React.FC = () => {
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{
+        overflowX: 'auto',
+        borderRadius: 3,
+        boxShadow: 3,
+        '& .MuiTable-root': {
+          minWidth: { xs: 700, sm: 'auto' },
+          tableLayout: 'fixed',
+          width: '100%'
+        },
+        '& .MuiTableHead-root': {
+          backgroundColor: '#e3f2fd'
+        },
+        '& .MuiTableCell-head, & .MuiTableCell-body': {
+          padding: '12px 16px !important',
+          textAlign: 'left',
+          verticalAlign: 'middle',
+          borderRight: '1px solid #e0e0e0',
+          wordWrap: 'break-word',
+          overflow: 'hidden'
+        },
+        '& .MuiTableCell-head': {
+          color: 'black',
+          fontWeight: 700,
+          fontSize: { xs: '0.8rem', sm: '0.9rem' },
+          position: 'sticky',
+          top: 0,
+          zIndex: 1,
+          backgroundColor: '#e3f2fd !important'
+        },
+        '& .MuiTableRow-root:nth-of-type(even)': {
+          backgroundColor: 'grey.50'
+        },
+        '& .MuiTableRow-root:hover': {
+          backgroundColor: 'grey.100'
+        }
+      }}>
         <Table>
+          <colgroup>
+            <col style={{ width: '15%' }} />
+            <col style={{ width: '25%' }} />
+            <col style={{ width: '30%' }} />
+            <col style={{ width: '15%' }} />
+            <col style={{ width: '15%' }} />
+          </colgroup>
           <TableHead>
             <TableRow>
               <TableCell>Día</TableCell>
               <TableCell>Horario</TableCell>
               <TableCell>Niveles</TableCell>
               <TableCell>Alumnos</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell align="center">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {turnosOrdenados.map((turno) => (
               <TableRow key={turno.id}>
-                <TableCell>{turno.dia}</TableCell>
-                <TableCell>{`${turno.hora_inicio} - ${turno.hora_fin}`}</TableCell>
                 <TableCell>
-                  {turno.niveles.map((nivel) => (
-                    <Chip
-                      key={nivel}
-                      label={nivel}
-                      size="small"
-                      sx={{
-                        backgroundColor: getCinturonColor(nivel),
-                        color: nivel === 'Blanco' ? 'black' : 'white',
-                        mr: 0.5
-                      }}
-                    />
-                  ))}
+                  <Typography variant="body2" fontWeight="bold">
+                    {turno.dia}
+                  </Typography>
                 </TableCell>
-                <TableCell>{getAlumnosPorTurno(turno.id).length} alumnos</TableCell>
                 <TableCell>
+                  <Typography variant="body2">
+                    {`${turno.hora_inicio} - ${turno.hora_fin}`}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {turno.niveles.map((nivel) => (
+                      <Chip
+                        key={nivel}
+                        label={nivel}
+                        size="small"
+                        sx={{
+                          backgroundColor: getCinturonColor(nivel),
+                          color: nivel === 'Blanco' ? 'black' : 'white'
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2">
+                    {getAlumnosPorTurno(turno.id).length} alumnos
+                  </Typography>
+                </TableCell>
+                <TableCell align="center">
                   <Button
                     variant="outlined"
                     size="small"

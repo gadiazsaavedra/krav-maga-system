@@ -177,8 +177,53 @@ const ExamenesTab: React.FC = () => {
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{
+        overflowX: 'auto',
+        borderRadius: 3,
+        boxShadow: 3,
+        '& .MuiTable-root': {
+          minWidth: { xs: 800, sm: 'auto' },
+          tableLayout: 'fixed',
+          width: '100%'
+        },
+        '& .MuiTableHead-root': {
+          backgroundColor: '#e3f2fd'
+        },
+        '& .MuiTableCell-head, & .MuiTableCell-body': {
+          padding: '12px 16px !important',
+          textAlign: 'left',
+          verticalAlign: 'middle',
+          borderRight: '1px solid #e0e0e0',
+          wordWrap: 'break-word',
+          overflow: 'hidden'
+        },
+        '& .MuiTableCell-head': {
+          color: 'black',
+          fontWeight: 700,
+          fontSize: { xs: '0.8rem', sm: '0.9rem' },
+          position: 'sticky',
+          top: 0,
+          zIndex: 1,
+          backgroundColor: '#e3f2fd !important'
+        },
+        '& .MuiTableRow-root:nth-of-type(even)': {
+          backgroundColor: 'grey.50'
+        },
+        '& .MuiTableRow-root:hover': {
+          backgroundColor: 'grey.100'
+        }
+      }}>
         <Table>
+          <colgroup>
+            <col style={{ width: '18%' }} />
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: '12%' }} />
+          </colgroup>
           <TableHead>
             <AlumnoTableRow isHeader>
               <TableCell>Alumno</TableCell>
@@ -194,10 +239,15 @@ const ExamenesTab: React.FC = () => {
           <TableBody>
             {examenes.map((examen) => (
               <TableRow key={examen.id}>
-                <TableCell>{`${examen.apellido}, ${examen.nombre}`}</TableCell>
+                <TableCell>
+                  <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {`${examen.apellido}, ${examen.nombre}`}
+                  </Typography>
+                </TableCell>
                 <TableCell>
                   <Chip
                     label={examen.cinturon_actual}
+                    size="small"
                     sx={{
                       backgroundColor: getCinturonColor(examen.cinturon_actual),
                       color: examen.cinturon_actual === 'Blanco' ? 'black' : 'white'
@@ -207,6 +257,7 @@ const ExamenesTab: React.FC = () => {
                 <TableCell>
                   <Chip
                     label={examen.cinturon_objetivo}
+                    size="small"
                     sx={{
                       backgroundColor: getCinturonColor(examen.cinturon_objetivo),
                       color: examen.cinturon_objetivo === 'Blanco' ? 'black' : 'white'
@@ -214,10 +265,14 @@ const ExamenesTab: React.FC = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  {new Date(examen.fecha_examen).toLocaleDateString()}
+                  <Typography variant="body2" noWrap>
+                    {new Date(examen.fecha_examen).toLocaleDateString()}
+                  </Typography>
                 </TableCell>
                 <TableCell>
-                  ${examen.monto?.toLocaleString()}
+                  <Typography variant="body2" noWrap>
+                    ${examen.monto?.toLocaleString()}
+                  </Typography>
                 </TableCell>
                 <TableCell align="center">
                   <Checkbox
@@ -233,11 +288,11 @@ const ExamenesTab: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   {examen.aprobado && examen.pagado ? (
-                    <Chip label="Completo" color="success" />
+                    <Chip label="Completo" color="success" size="small" />
                   ) : examen.aprobado ? (
-                    <Chip label="Pendiente Pago" color="warning" />
+                    <Chip label="Pendiente Pago" color="warning" size="small" />
                   ) : (
-                    <Chip label="Pendiente" color="error" />
+                    <Chip label="Pendiente" color="error" size="small" />
                   )}
                 </TableCell>
               </TableRow>
@@ -312,6 +367,7 @@ const ExamenesTab: React.FC = () => {
                 type="number"
                 value={formData.monto}
                 onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
+                inputProps={{ inputMode: 'numeric' }}
               />
             </Grid>
           </Grid>

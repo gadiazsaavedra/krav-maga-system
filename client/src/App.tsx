@@ -6,6 +6,7 @@ import { CssBaseline, AppBar, Toolbar, Typography, Container, Tabs, Tab, Box } f
 // import 'dayjs/locale/es';
 // React Query removido - no se usa
 import { AppProvider } from './context/AppContext';
+import { useSwipeGestures } from './hooks/useSwipeGestures';
 
 import { lazy, Suspense } from 'react';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -17,6 +18,7 @@ const RenovacionesTab = lazy(() => import('./components/RenovacionesTab'));
 const ExamenesTab = lazy(() => import('./components/ExamenesTab'));
 const TurnosTab = lazy(() => import('./components/TurnosTab'));
 const AsistenciasTab = lazy(() => import('./components/AsistenciasTab'));
+const InstructorTab = lazy(() => import('./components/InstructorTab'));
 
 const theme = createTheme({
   palette: {
@@ -89,10 +91,26 @@ function TabPanel(props: TabPanelProps) {
 
 function App() {
   const [tabValue, setTabValue] = useState(0);
+  const totalTabs = 8;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  // Gestos de swipe para cambiar tabs
+  const swipeHandlers = useSwipeGestures({
+    onSwipeLeft: () => {
+      if (tabValue < totalTabs - 1) {
+        setTabValue(tabValue + 1);
+      }
+    },
+    onSwipeRight: () => {
+      if (tabValue > 0) {
+        setTabValue(tabValue - 1);
+      }
+    },
+    threshold: 100
+  });
 
   return (
       <AppProvider>
@@ -114,7 +132,7 @@ function App() {
           </Toolbar>
         </AppBar>
         
-        <Container sx={{ mt: 1, px: { xs: 1, sm: 2 } }}>
+        <Container sx={{ mt: 1, px: { xs: 1, sm: 2 } }} {...swipeHandlers}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs 
               value={tabValue} 
@@ -136,6 +154,7 @@ function App() {
               <Tab label="Exámenes" />
               <Tab label="Turnos" />
               <Tab label="Asistencias" />
+              <Tab label="Instructor" />
             </Tabs>
           </Box>
           
@@ -172,6 +191,11 @@ function App() {
           <TabPanel value={tabValue} index={6}>
             <Suspense fallback={<LoadingSpinner />}>
               <AsistenciasTab />
+            </Suspense>
+          </TabPanel>
+          <TabPanel value={tabValue} index={7}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <InstructorTab />
             </Suspense>
           </TabPanel>
         </Container>

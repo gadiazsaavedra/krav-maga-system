@@ -1,10 +1,10 @@
 // Datos de demostración para el MVP
 export const mockAlumnos = [
-  { id: 1, nombre: 'Juan', apellido: 'Pérez', cinturon: 'Amarillo', telefono: '11-1234-5678', email: 'juan@email.com', activo: 1 },
-  { id: 2, nombre: 'María', apellido: 'González', cinturon: 'Verde', telefono: '11-2345-6789', email: 'maria@email.com', activo: 1 },
-  { id: 3, nombre: 'Carlos', apellido: 'Rodríguez', cinturon: 'Blanco', telefono: '11-3456-7890', email: 'carlos@email.com', activo: 1 },
-  { id: 4, nombre: 'Ana', apellido: 'López', cinturon: 'Azul', telefono: '11-4567-8901', email: 'ana@email.com', activo: 1 },
-  { id: 5, nombre: 'Pedro', apellido: 'Martín', cinturon: 'Naranja', telefono: '11-5678-9012', email: 'pedro@email.com', activo: 1 }
+  { id: 1, nombre: 'Juan', apellido: 'Pérez', cinturon: 'Amarillo', telefono: '11-1234-5678', email: 'juan@email.com', grupo: 'Lun y Mie 18:00-19:00', activo: 1 },
+  { id: 2, nombre: 'María', apellido: 'González', cinturon: 'Verde', telefono: '11-2345-6789', email: 'maria@email.com', grupo: 'Lun y Mie 20:00-21:00', activo: 1 },
+  { id: 3, nombre: 'Carlos', apellido: 'Rodríguez', cinturon: 'Blanco', telefono: '11-3456-7890', email: 'carlos@email.com', grupo: 'Lun y Mie 17:00-18:00', activo: 1 },
+  { id: 4, nombre: 'Ana', apellido: 'López', cinturon: 'Azul', telefono: '11-4567-8901', email: 'ana@email.com', grupo: 'Mar y Jue 13:00-14:00', activo: 1 },
+  { id: 5, nombre: 'Pedro', apellido: 'Martín', cinturon: 'Naranja', telefono: '11-5678-9012', email: 'pedro@email.com', grupo: 'Vie 17:30-19:10', activo: 1 }
 ];
 
 export const mockProductos = [
