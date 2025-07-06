@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AlumnoTableRow from './AlumnoTableRow';
 import {
-  Box, Typography, Grid, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Checkbox, Button, FormControl,
-  InputLabel, Select, MenuItem, TextField, Card, CardContent, Alert
+  Box, Typography, Grid, Paper, Button, FormControl,
+  InputLabel, Select, MenuItem, TextField, Card, CardContent, Alert, Fab, Chip
 } from '@mui/material';
-import { EventAvailable, CheckCircle, Cancel } from '@mui/icons-material';
+import { EventAvailable, Person, Save, CheckCircle, Cancel } from '@mui/icons-material';
+import ToggleSwitch from './ToggleSwitch';
 
 // Interfaces
 interface Turno {
@@ -281,187 +281,217 @@ const AsistenciasTab: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" component="h2">
-          <EventAvailable sx={{ mr: 1, verticalAlign: 'middle' }} />
-          Control de Asistencias
+      {/* Header Mobile-First */}
+      <Box sx={{ mb: 3, textAlign: 'center' }}>
+        <Typography variant="h4" component="h1" sx={{ 
+          fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+          fontWeight: 600,
+          color: 'primary.main'
+        }}>
+          ✅ Asistencias
         </Typography>
       </Box>
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Total Asistencias
-              </Typography>
-              <Typography variant="h4" component="div" color="success.main">
+      {/* Dashboard Mobile-First */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={4} sm={4}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            bgcolor: 'success.main',
+            color: 'white',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 2, sm: 2 } }}>
+              <Typography variant="h2" component="div" sx={{ 
+                fontSize: { xs: '1.5rem', sm: '2rem' },
+                fontWeight: 700,
+                mb: 0.5
+              }}>
                 {totalAsistencias}
               </Typography>
+              <Typography sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
+                ✅ Presentes
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={4}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Total Ausencias
-              </Typography>
-              <Typography variant="h4" component="div" color="error.main">
+        <Grid item xs={4} sm={4}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            bgcolor: 'error.main',
+            color: 'white',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 2, sm: 2 } }}>
+              <Typography variant="h2" component="div" sx={{ 
+                fontSize: { xs: '1.5rem', sm: '2rem' },
+                fontWeight: 700,
+                mb: 0.5
+              }}>
                 {totalAusencias}
               </Typography>
+              <Typography sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
+                ❌ Ausentes
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={4}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Porcentaje de Asistencia
-              </Typography>
-              <Typography variant="h4" component="div" color="primary.main">
+        <Grid item xs={4} sm={4}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            bgcolor: 'primary.main',
+            color: 'white',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 2, sm: 2 } }}>
+              <Typography variant="h2" component="div" sx={{ 
+                fontSize: { xs: '1.5rem', sm: '2rem' },
+                fontWeight: 700,
+                mb: 0.5
+              }}>
                 {porcentajeAsistencia}%
               </Typography>
+              <Typography sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
+                📊 Asistencia
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Turno</InputLabel>
-            <Select
-              value={selectedTurno}
-              label="Turno"
-              onChange={(e) => setSelectedTurno(e.target.value)}
+      {/* Controles Mobile-First */}
+      <Box sx={{ mb: 3 }}>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth size="medium">
+              <InputLabel>Turno</InputLabel>
+              <Select
+                value={selectedTurno}
+                label="Turno"
+                onChange={(e) => setSelectedTurno(e.target.value)}
+              >
+                {turnosFiltrados.map((turno) => (
+                  <MenuItem key={turno.id} value={turno.id}>
+                    {`${turno.dia} ${turno.hora_inicio}-${turno.hora_fin}`}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Fecha"
+              type="date"
+              value={selectedFecha}
+              onChange={(e) => setSelectedFecha(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              size="medium"
+            />
+          </Grid>
+        </Grid>
+        
+        {turnoSeleccionado && (
+          <Box sx={{ textAlign: 'center', mb: 2 }}>
+            <Chip 
+              label={`${turnoSeleccionado.dia} ${turnoSeleccionado.hora_inicio}-${turnoSeleccionado.hora_fin} | ${new Date(selectedFecha).toLocaleDateString()}`}
+              color="primary"
+              sx={{ fontSize: '0.9rem', py: 2, px: 1 }}
+            />
+          </Box>
+        )}
+      </Box>
+
+      {/* Cards Mobile-First */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {alumnos.length === 0 && !loading && !error ? (
+          <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
+            <CardContent sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="body1" color="text.secondary">
+                😅 No hay alumnos asignados a este turno
+              </Typography>
+            </CardContent>
+          </Card>
+        ) : loading ? (
+          <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
+            <CardContent sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="body1" color="text.secondary">
+                🔄 Cargando alumnos...
+              </Typography>
+            </CardContent>
+          </Card>
+        ) : alumnos.map((alumno) => {
+          const asistencia = asistencias.find(a => a.alumno_id === alumno.id);
+          const presente = asistencia ? asistencia.presente : false;
+          
+          return (
+            <Card 
+              key={alumno.id}
+              sx={{ 
+                borderRadius: 3,
+                boxShadow: 2,
+                borderLeft: `4px solid ${presente ? '#4caf50' : '#f44336'}`,
+                '&:hover': {
+                  boxShadow: 4,
+                  transform: 'translateY(-2px)'
+                },
+                transition: 'all 0.2s ease'
+              }}
             >
-              {turnosFiltrados.map((turno) => (
-                <MenuItem key={turno.id} value={turno.id}>
-                  {`${turno.dia} ${turno.hora_inicio}-${turno.hora_fin}`}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Fecha"
-            type="date"
-            value={selectedFecha}
-            onChange={(e) => setSelectedFecha(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-      </Grid>
-
-      {turnoSeleccionado && (
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="h6">
-            Asistencia: {turnoSeleccionado.dia} {turnoSeleccionado.hora_inicio}-{turnoSeleccionado.hora_fin} | {selectedFecha}
-          </Typography>
-        </Box>
-      )}
-
-      <TableContainer component={Paper} sx={{
-        overflowX: 'auto',
-        borderRadius: 3,
-        boxShadow: 3,
-        '& .MuiTable-root': {
-          minWidth: { xs: 600, sm: 'auto' },
-          tableLayout: 'fixed',
-          width: '100%'
-        },
-        '& .MuiTableHead-root': {
-          backgroundColor: '#e3f2fd'
-        },
-        '& .MuiTableCell-head, & .MuiTableCell-body': {
-          padding: '12px 16px !important',
-          textAlign: 'left',
-          verticalAlign: 'middle',
-          borderRight: '1px solid #e0e0e0',
-          wordWrap: 'break-word',
-          overflow: 'hidden'
-        },
-        '& .MuiTableCell-head': {
-          color: 'black',
-          fontWeight: 700,
-          fontSize: { xs: '0.8rem', sm: '0.9rem' },
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          backgroundColor: '#e3f2fd !important'
-        },
-        '& .MuiTableRow-root:nth-of-type(even)': {
-          backgroundColor: 'grey.50'
-        },
-        '& .MuiTableRow-root:hover': {
-          backgroundColor: 'grey.100'
-        }
-      }}>
-        <Table>
-          <colgroup>
-            <col style={{ width: '50%' }} />
-            <col style={{ width: '25%' }} />
-            <col style={{ width: '25%' }} />
-          </colgroup>
-          <TableHead>
-            <AlumnoTableRow isHeader>
-              <TableCell>Alumno</TableCell>
-              <TableCell align="center">Presente</TableCell>
-              <TableCell align="center">Ausente</TableCell>
-            </AlumnoTableRow>
-          </TableHead>
-          <TableBody>
-            {alumnos.length === 0 && !loading && !error ? (
-              <TableRow>
-                <TableCell colSpan={3} align="center">
-                  No hay alumnos asignados a este turno
-                </TableCell>
-              </TableRow>
-            ) : loading ? (
-              <TableRow>
-                <TableCell colSpan={3} align="center">
-                  Cargando alumnos...
-                </TableCell>
-              </TableRow>
-            ) : alumnos.map((alumno) => {
-              const asistencia = asistencias.find(a => a.alumno_id === alumno.id);
-              const presente = asistencia ? asistencia.presente : false;
-              
-              return (
-                <TableRow key={alumno.id}>
-                  <TableCell>
-                    <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {`${alumno.apellido}, ${alumno.nombre}`}
+              <CardContent sx={{ py: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
+                    <Person fontSize="small" color="action" />
+                    <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+                      {alumno.apellido}, {alumno.nombre}
                     </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Checkbox
-                      icon={<Cancel />}
-                      checkedIcon={<CheckCircle />}
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {presente ? 'Presente' : 'Ausente'}
+                    </Typography>
+                    <ToggleSwitch
                       checked={presente}
-                      onChange={(e) => handleAsistenciaChange(alumno.id, e.target.checked)}
+                      onChange={(checked) => handleAsistenciaChange(alumno.id, checked)}
+                      label=""
+                      size="medium"
+                      color={presente ? "success" : "error"}
                     />
-                  </TableCell>
-                  <TableCell align="center">
-                    <Checkbox
-                      icon={<Cancel />}
-                      checkedIcon={<CheckCircle />}
-                      checked={!presente}
-                      onChange={(e) => handleAsistenciaChange(alumno.id, !e.target.checked)}
-                    />
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </Box>
+      
+      {/* FAB para guardar */}
+      <Fab
+        color="primary"
+        onClick={handleGuardarAsistencias}
+        disabled={!selectedTurno || !selectedFecha || loading}
+        sx={{
+          position: 'fixed',
+          bottom: { xs: 80, sm: 16 },
+          right: 16,
+          zIndex: 1000
+        }}
+      >
+        <Save />
+      </Fab>
       
       {error && (
         <Box sx={{ mt: 2, p: 2, bgcolor: 'error.light', borderRadius: 1 }}>
@@ -472,15 +502,7 @@ const AsistenciasTab: React.FC = () => {
         </Box>
       )}
 
-      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-        <Button
-          variant="contained"
-          onClick={handleGuardarAsistencias}
-          disabled={!selectedTurno || !selectedFecha || loading}
-        >
-          {loading ? 'Guardando...' : 'Guardar Asistencias'}
-        </Button>
-      </Box>
+
     </Box>
   );
 };

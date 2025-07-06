@@ -4,10 +4,10 @@ import AlumnoTableRow from './AlumnoTableRow';
 import {
   Box, Typography, Button, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, Select, MenuItem, FormControl, InputLabel,
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, Chip, Grid, Checkbox
+  Paper, Chip, Grid, Card, CardContent, Fab, Divider
 } from '@mui/material';
-import { School, Add } from '@mui/icons-material';
+import { School, Add, Person, ArrowForward } from '@mui/icons-material';
+import ToggleSwitch from './ToggleSwitch';
 
 interface Alumno {
   id: number;
@@ -163,143 +163,238 @@ const ExamenesTab: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" component="h2">
-          <School sx={{ mr: 1, verticalAlign: 'middle' }} />
-          Gestión de Exámenes
+      {/* Header Mobile-First */}
+      <Box sx={{ mb: 3, textAlign: 'center' }}>
+        <Typography variant="h4" component="h1" sx={{ 
+          fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+          fontWeight: 600,
+          color: 'primary.main'
+        }}>
+          🥋 Exámenes
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => setOpen(true)}
-        >
-          Nuevo Examen
-        </Button>
       </Box>
+      
+      {/* Dashboard Mobile-First */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={6} sm={3}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            bgcolor: 'success.main',
+            color: 'white',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 3, sm: 2 } }}>
+              <Typography variant="h2" component="div" sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem' },
+                fontWeight: 700,
+                mb: 1
+              }}>
+                {examenes.filter(e => e.aprobado && e.pagado).length}
+              </Typography>
+              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                ✅ Completos
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            bgcolor: 'warning.main',
+            color: 'white',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 3, sm: 2 } }}>
+              <Typography variant="h2" component="div" sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem' },
+                fontWeight: 700,
+                mb: 1
+              }}>
+                {examenes.filter(e => e.aprobado && !e.pagado).length}
+              </Typography>
+              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                💰 Pend. Pago
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            bgcolor: 'error.main',
+            color: 'white',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 3, sm: 2 } }}>
+              <Typography variant="h2" component="div" sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem' },
+                fontWeight: 700,
+                mb: 1
+              }}>
+                {examenes.filter(e => !e.aprobado).length}
+              </Typography>
+              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                ⏳ Pendientes
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            bgcolor: 'primary.main',
+            color: 'white',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 3, sm: 2 } }}>
+              <Typography variant="h2" component="div" sx={{ 
+                fontSize: { xs: '1.5rem', sm: '2rem' },
+                fontWeight: 700,
+                mb: 1
+              }}>
+                ${(examenes.filter(e => e.pagado).reduce((sum, e) => sum + e.monto, 0) / 1000).toFixed(0)}K
+              </Typography>
+              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                💵 Recaudado
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
-      <TableContainer component={Paper} sx={{
-        overflowX: 'auto',
-        borderRadius: 3,
-        boxShadow: 3,
-        '& .MuiTable-root': {
-          minWidth: { xs: 800, sm: 'auto' },
-          tableLayout: 'fixed',
-          width: '100%'
-        },
-        '& .MuiTableHead-root': {
-          backgroundColor: '#e3f2fd'
-        },
-        '& .MuiTableCell-head, & .MuiTableCell-body': {
-          padding: '12px 16px !important',
-          textAlign: 'left',
-          verticalAlign: 'middle',
-          borderRight: '1px solid #e0e0e0',
-          wordWrap: 'break-word',
-          overflow: 'hidden'
-        },
-        '& .MuiTableCell-head': {
-          color: 'black',
-          fontWeight: 700,
-          fontSize: { xs: '0.8rem', sm: '0.9rem' },
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          backgroundColor: '#e3f2fd !important'
-        },
-        '& .MuiTableRow-root:nth-of-type(even)': {
-          backgroundColor: 'grey.50'
-        },
-        '& .MuiTableRow-root:hover': {
-          backgroundColor: 'grey.100'
-        }
-      }}>
-        <Table>
-          <colgroup>
-            <col style={{ width: '18%' }} />
-            <col style={{ width: '14%' }} />
-            <col style={{ width: '14%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '10%' }} />
-            <col style={{ width: '10%' }} />
-            <col style={{ width: '10%' }} />
-            <col style={{ width: '12%' }} />
-          </colgroup>
-          <TableHead>
-            <AlumnoTableRow isHeader>
-              <TableCell>Alumno</TableCell>
-              <TableCell>Cinturón Actual</TableCell>
-              <TableCell>Cinturón Objetivo</TableCell>
-              <TableCell>Fecha Examen</TableCell>
-              <TableCell>Monto</TableCell>
-              <TableCell align="center">Aprobado</TableCell>
-              <TableCell align="center">Pagado</TableCell>
-              <TableCell>Estado</TableCell>
-            </AlumnoTableRow>
-          </TableHead>
-          <TableBody>
-            {examenes.map((examen) => (
-              <TableRow key={examen.id}>
-                <TableCell>
-                  <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {`${examen.apellido}, ${examen.nombre}`}
-                  </Typography>
-                </TableCell>
-                <TableCell>
+      {/* Cards Mobile-First */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {examenes.map((examen) => (
+          <Card 
+            key={examen.id}
+            sx={{ 
+              borderRadius: 3,
+              boxShadow: 2,
+              borderLeft: `4px solid ${
+                examen.aprobado && examen.pagado ? '#4caf50' :
+                examen.aprobado ? '#ff9800' : '#f44336'
+              }`,
+              '&:hover': {
+                boxShadow: 4,
+                transform: 'translateY(-2px)'
+              },
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <CardContent sx={{ pb: 1 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                <Box sx={{ flex: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Person fontSize="small" color="action" />
+                    <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+                      {examen.apellido}, {examen.nombre}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Chip
+                      label={examen.cinturon_actual}
+                      size="medium"
+                      sx={{
+                        backgroundColor: getCinturonColor(examen.cinturon_actual),
+                        color: examen.cinturon_actual === 'Blanco' ? 'black' : 'white',
+                        fontWeight: 600
+                      }}
+                    />
+                    <ArrowForward fontSize="small" color="action" />
+                    <Chip
+                      label={examen.cinturon_objetivo}
+                      size="medium"
+                      sx={{
+                        backgroundColor: getCinturonColor(examen.cinturon_objetivo),
+                        color: examen.cinturon_objetivo === 'Blanco' ? 'black' : 'white',
+                        fontWeight: 600
+                      }}
+                    />
+                  </Box>
+                  
                   <Chip
-                    label={examen.cinturon_actual}
-                    size="small"
-                    sx={{
-                      backgroundColor: getCinturonColor(examen.cinturon_actual),
-                      color: examen.cinturon_actual === 'Blanco' ? 'black' : 'white'
-                    }}
+                    label={
+                      examen.aprobado && examen.pagado ? 'Completo' :
+                      examen.aprobado ? 'Pendiente Pago' : 'Pendiente'
+                    }
+                    color={
+                      examen.aprobado && examen.pagado ? 'success' :
+                      examen.aprobado ? 'warning' : 'error'
+                    }
+                    size="medium"
+                    sx={{ fontWeight: 600 }}
                   />
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={examen.cinturon_objetivo}
-                    size="small"
-                    sx={{
-                      backgroundColor: getCinturonColor(examen.cinturon_objetivo),
-                      color: examen.cinturon_objetivo === 'Blanco' ? 'black' : 'white'
-                    }}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
-                    {new Date(examen.fecha_examen).toLocaleDateString()}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
+                </Box>
+                
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography variant="h5" color="primary.main" fontWeight="bold">
                     ${examen.monto?.toLocaleString()}
                   </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Checkbox
+                  <Typography variant="body2" color="text.secondary">
+                    {new Date(examen.fecha_examen).toLocaleDateString()}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Divider sx={{ mb: 2 }} />
+              
+              <Box sx={{ display: 'flex', justifyContent: 'space-around', gap: 2 }}>
+                <Box sx={{ textAlign: 'center', flex: 1 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    Aprobado
+                  </Typography>
+                  <ToggleSwitch
                     checked={examen.aprobado}
-                    onChange={(e) => handleAprobar(examen.id, e.target.checked, examen.cinturon_objetivo)}
+                    onChange={(checked) => handleAprobar(examen.id, checked, examen.cinturon_objetivo)}
+                    label=""
+                    size="medium"
+                    color="success"
                   />
-                </TableCell>
-                <TableCell align="center">
-                  <Checkbox
+                </Box>
+                
+                <Box sx={{ textAlign: 'center', flex: 1 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    Pagado
+                  </Typography>
+                  <ToggleSwitch
                     checked={examen.pagado}
-                    onChange={(e) => handlePago(examen.id, e.target.checked)}
+                    onChange={(checked) => handlePago(examen.id, checked)}
+                    label=""
+                    size="medium"
+                    color="primary"
                   />
-                </TableCell>
-                <TableCell>
-                  {examen.aprobado && examen.pagado ? (
-                    <Chip label="Completo" color="success" size="small" />
-                  ) : examen.aprobado ? (
-                    <Chip label="Pendiente Pago" color="warning" size="small" />
-                  ) : (
-                    <Chip label="Pendiente" color="error" size="small" />
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
+      
+      <Fab
+        color="primary"
+        onClick={() => setOpen(true)}
+        sx={{
+          position: 'fixed',
+          bottom: { xs: 80, sm: 16 },
+          right: 16,
+          zIndex: 1000
+        }}
+      >
+        <Add />
+      </Fab>
 
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>Nuevo Examen de Cinturón</DialogTitle>

@@ -224,134 +224,272 @@ const MensualidadesTab: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" component="h2">
-          <Payment sx={{ mr: 1, verticalAlign: 'middle' }} />
-          Control de Mensualidades
+      {/* Header Mobile-First */}
+      <Box sx={{ mb: 3, textAlign: 'center' }}>
+        <Typography variant="h4" component="h1" sx={{ 
+          fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+          fontWeight: 600,
+          color: 'primary.main'
+        }}>
+          💰 Mensualidades
         </Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button
+      </Box>
+
+      {/* Filtros simplificados */}
+      <Box sx={{ mb: 3, textAlign: 'center' }}>
+        <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+          {meses[selectedMes - 1]} {selectedAño}
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Chip 
+            label="Mes Anterior" 
+            variant="outlined" 
+            onClick={() => {
+              if (selectedMes === 1) {
+                setSelectedMes(12);
+                setSelectedAño(selectedAño - 1);
+              } else {
+                setSelectedMes(selectedMes - 1);
+              }
+            }}
+            sx={{ minHeight: 40 }}
+          />
+          <Chip 
+            label="Mes Actual" 
+            color="primary"
+            onClick={() => {
+              const now = new Date();
+              setSelectedMes(now.getMonth() + 1);
+              setSelectedAño(now.getFullYear());
+            }}
+            sx={{ minHeight: 40 }}
+          />
+          <Chip 
+            label="Mes Siguiente" 
             variant="outlined"
-            onClick={() => setTarifasOpen(true)}
-          >
-            Configurar Tarifas
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => setOpen(true)}
-          >
-            Registrar Pago
-          </Button>
+            onClick={() => {
+              if (selectedMes === 12) {
+                setSelectedMes(1);
+                setSelectedAño(selectedAño + 1);
+              } else {
+                setSelectedMes(selectedMes + 1);
+              }
+            }}
+            sx={{ minHeight: 40 }}
+          />
         </Box>
       </Box>
 
+      {/* Dashboard Mobile-First */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
-          <FormControl fullWidth>
-            <InputLabel>Mes</InputLabel>
-            <Select
-              value={selectedMes}
-              onChange={(e) => setSelectedMes(Number(e.target.value))}
-            >
-              {meses.map((mes, index) => (
-                <MenuItem key={index} value={index + 1}>
-                  {mes}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <TextField
-            fullWidth
-            label="Año"
-            type="number"
-            value={selectedAño}
-            onChange={(e) => setSelectedAño(Number(e.target.value))}
-          />
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Button 
-            fullWidth 
-            variant="outlined" 
-            sx={{ height: '56px' }}
-          >
-            Actualizar Datos
-          </Button>
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Pagos al Día
-              </Typography>
-              <Typography variant="h4" component="div" color="success.main">
+        <Grid item xs={6} sm={3}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 3, sm: 2 } }}>
+              <Typography variant="h2" component="div" color="success.main" sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem' },
+                fontWeight: 700,
+                mb: 1
+              }}>
                 {pagados}
               </Typography>
+              <Typography color="textSecondary" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                ✅ Al Día
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Morosos
-              </Typography>
-              <Typography variant="h4" component="div" color="warning.main">
+        <Grid item xs={6} sm={3}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 3, sm: 2 } }}>
+              <Typography variant="h2" component="div" color="warning.main" sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem' },
+                fontWeight: 700,
+                mb: 1
+              }}>
                 {morosos}
               </Typography>
+              <Typography color="textSecondary" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                ⚠️ Morosos
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Inactivos (+90d)
-              </Typography>
-              <Typography variant="h4" component="div" color="error.main">
+        <Grid item xs={6} sm={3}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 3, sm: 2 } }}>
+              <Typography variant="h2" component="div" color="error.main" sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem' },
+                fontWeight: 700,
+                mb: 1
+              }}>
                 {inactivos}
               </Typography>
+              <Typography color="textSecondary" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                ❌ Inactivos
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Total Recaudado
+        <Grid item xs={6} sm={3}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 3, sm: 2 } }}>
+              <Typography variant="h2" component="div" color="primary.main" sx={{ 
+                fontSize: { xs: '1.5rem', sm: '2rem' },
+                fontWeight: 700,
+                mb: 1
+              }}>
+                ${(totalRecaudado / 1000).toFixed(0)}K
               </Typography>
-              <Typography variant="h4" component="div" color="primary.main">
-                ${totalRecaudado.toLocaleString()}
+              <Typography color="textSecondary" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                💰 Recaudado
               </Typography>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      {/* Cards Mobile-First */}
+      {/* Cards Mobile-First con Swipe Actions */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {pagosOrdenados.map((pago) => (
-          <Card 
+          <Box
             key={pago.id}
-            sx={{ 
-              borderRadius: 3,
-              boxShadow: 2,
-              borderLeft: `4px solid ${
-                pago.estado === 'Pagado' ? '#4caf50' :
-                pago.dias_atraso > 90 ? '#f44336' :
-                pago.dias_atraso > 0 ? '#ff9800' : '#2196f3'
-              }`,
-              '&:hover': {
-                boxShadow: 4,
-                transform: 'translateY(-2px)'
-              },
-              transition: 'all 0.2s ease'
+            sx={{ position: 'relative', overflow: 'hidden', borderRadius: 3 }}
+            onTouchStart={(e) => {
+              const touch = e.touches[0];
+              (e.currentTarget as any).startX = touch.clientX;
+              (e.currentTarget as any).startY = touch.clientY;
+            }}
+            onTouchMove={(e) => {
+              const touch = e.touches[0];
+              const element = e.currentTarget as any;
+              const deltaX = touch.clientX - element.startX;
+              const deltaY = touch.clientY - element.startY;
+              
+              if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
+                e.preventDefault();
+                const card = element.querySelector('.swipe-card');
+                if (card) {
+                  card.style.transform = `translateX(${deltaX}px)`;
+                }
+              }
+            }}
+            onTouchEnd={(e) => {
+              const element = e.currentTarget as any;
+              const card = element.querySelector('.swipe-card');
+              if (card) {
+                const transform = card.style.transform;
+                const translateX = transform ? parseInt(transform.match(/-?\\d+/)?.[0] || '0') : 0;
+                
+                if (Math.abs(translateX) > 80) {
+                  if (translateX > 0) {
+                    // Swipe right → Llamar (si hay teléfono)
+                    const alumno = alumnos.find((a: any) => a.id === pago.id);
+                    if (alumno?.telefono) {
+                      window.open(`tel:${alumno.telefono}`, '_self');
+                    }
+                  } else {
+                    // Swipe left → Pago rápido
+                    if (pago.estado === 'Pendiente') {
+                      handlePagoRapido(pago);
+                    }
+                  }
+                }
+                
+                card.style.transform = 'translateX(0px)';
+                card.style.transition = 'transform 0.3s ease';
+                setTimeout(() => {
+                  card.style.transition = '';
+                }, 300);
+              }
             }}
           >
+            {/* Acciones de fondo */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                zIndex: 1
+              }}
+            >
+              <Box
+                sx={{
+                  flex: 1,
+                  backgroundColor: 'info.main',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  pl: 3,
+                  color: 'white'
+                }}
+              >
+                <Phone sx={{ mr: 1 }} />
+                <Typography variant="body2" fontWeight="bold">Llamar</Typography>
+              </Box>
+              
+              <Box
+                sx={{
+                  flex: 1,
+                  backgroundColor: 'success.main',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  pr: 3,
+                  color: 'white'
+                }}
+              >
+                <Typography variant="body2" fontWeight="bold">Pagar</Typography>
+                <AttachMoney sx={{ ml: 1 }} />
+              </Box>
+            </Box>
+            
+            <Card 
+              className="swipe-card"
+              sx={{ 
+                borderRadius: 3,
+                boxShadow: 2,
+                position: 'relative',
+                zIndex: 2,
+                backgroundColor: 'white',
+                borderLeft: `4px solid ${
+                  pago.estado === 'Pagado' ? '#4caf50' :
+                  pago.dias_atraso > 90 ? '#f44336' :
+                  pago.dias_atraso > 0 ? '#ff9800' : '#2196f3'
+                }`,
+                '&:hover': {
+                  boxShadow: 4,
+                  transform: 'translateY(-2px)'
+                },
+                transition: 'box-shadow 0.2s ease, transform 0.2s ease'
+              }}
+            >
             <CardContent sx={{ pb: 1 }}>
               {/* Header con nombre y estado */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -436,11 +574,12 @@ const MensualidadesTab: React.FC = () => {
                 )}
               </Box>
             </CardContent>
-          </Card>
+            </Card>
+          </Box>
         ))}
       </Box>
       
-      {/* Floating Action Button */}
+      {/* Floating Action Buttons */}
       <Fab
         color="primary"
         onClick={() => setOpen(true)}
@@ -453,165 +592,347 @@ const MensualidadesTab: React.FC = () => {
       >
         <Add />
       </Fab>
+      
+      {/* FAB Secundario para configuración */}
+      <Fab
+        size="small"
+        color="secondary"
+        onClick={() => setTarifasOpen(true)}
+        sx={{
+          position: 'fixed',
+          bottom: { xs: 140, sm: 76 },
+          right: 16,
+          zIndex: 999
+        }}
+      >
+        ⚙️
+      </Fab>
 
-      {/* Dialog para registro de pago completo */}
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Registrar Pago de Mensualidad</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
-              <Autocomplete
-                options={alumnos}
-                getOptionLabel={(alumno: any) => `${alumno.apellido}, ${alumno.nombre}`}
-                renderInput={(params) => <TextField {...params} label="Buscar Alumno" />}
-                onChange={(event, newValue: any) => {
-                  if (newValue) {
-                    const montoSugerido = obtenerMontoSugerido(newValue.id);
-                    setFormData({ 
-                      ...formData, 
-                      alumno_id: newValue.id.toString(),
-                      monto: montoSugerido.toString()
-                    });
-                  }
-                }}
-                isOptionEqualToValue={(option: any, value: any) => option.id === value.id}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Monto"
-                type="number"
-                value={formData.monto}
-                onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Método de Pago</InputLabel>
-                <Select
-                  value={formData.metodo_pago}
-                  label="Método de Pago"
-                  onChange={(e) => setFormData({ ...formData, metodo_pago: e.target.value })}
-                >
-                  <MenuItem value="Efectivo">Efectivo</MenuItem>
-                  <MenuItem value="Transferencia">Transferencia</MenuItem>
-                  <MenuItem value="Tarjeta">Tarjeta</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
+      {/* Dialog Mobile-First */}
+      <Dialog 
+        open={open} 
+        onClose={handleClose} 
+        fullScreen
+        maxWidth="sm" 
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            margin: { xs: 0, sm: 2 },
+            maxHeight: { xs: '100vh', sm: '90vh' },
+            height: { xs: '100vh', sm: 'auto' },
+            borderRadius: { xs: 0, sm: 3 }
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          backgroundColor: 'primary.main',
+          color: 'white',
+          fontSize: { xs: '1.25rem', sm: '1.5rem' },
+          fontWeight: 600,
+          textAlign: 'center',
+          py: { xs: 3, sm: 2 }
+        }}>
+          💰 Registrar Pago
+        </DialogTitle>
+        <DialogContent sx={{ p: { xs: 3, sm: 3 } }}>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, color: 'primary.main' }}>
+              Seleccionar Alumno
+            </Typography>
+            <Autocomplete
+              options={alumnos}
+              getOptionLabel={(alumno: any) => `${alumno.apellido}, ${alumno.nombre}`}
+              renderInput={(params) => <TextField {...params} label="Buscar Alumno" size="medium" />}
+              onChange={(event, newValue: any) => {
+                if (newValue) {
+                  const montoSugerido = obtenerMontoSugerido(newValue.id);
+                  setFormData({ 
+                    ...formData, 
+                    alumno_id: newValue.id.toString(),
+                    monto: montoSugerido.toString()
+                  });
+                }
+              }}
+              isOptionEqualToValue={(option: any, value: any) => option.id === value.id}
+              fullWidth
+              sx={{ mb: 3 }}
+            />
+            
+            <Typography variant="h6" sx={{ mb: 2, color: 'primary.main' }}>
+              Detalles del Pago
+            </Typography>
+            <TextField
+              fullWidth
+              label="Monto"
+              type="number"
+              value={formData.monto}
+              onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
+              size="medium"
+              sx={{ mb: 3 }}
+              InputProps={{
+                startAdornment: <Typography sx={{ mr: 1 }}>$</Typography>
+              }}
+            />
+            
+            <FormControl fullWidth size="medium">
+              <InputLabel>Método de Pago</InputLabel>
+              <Select
+                value={formData.metodo_pago}
+                label="Método de Pago"
+                onChange={(e) => setFormData({ ...formData, metodo_pago: e.target.value })}
+              >
+                <MenuItem value="Efectivo">💵 Efectivo</MenuItem>
+                <MenuItem value="Transferencia">💳 Transferencia</MenuItem>
+                <MenuItem value="Tarjeta">💳 Tarjeta</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancelar</Button>
-          <Button onClick={handleSubmit} variant="contained">
-            Registrar Pago
+        <DialogActions sx={{ 
+          p: { xs: 3, sm: 2 },
+          gap: 2,
+          flexDirection: { xs: 'column', sm: 'row' }
+        }}>
+          <Button 
+            onClick={handleClose}
+            size="large"
+            sx={{ 
+              minHeight: 48,
+              width: { xs: '100%', sm: 'auto' },
+              minWidth: { sm: 120 }
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleSubmit} 
+            variant="contained"
+            size="large"
+            sx={{
+              minHeight: 48,
+              width: { xs: '100%', sm: 'auto' },
+              minWidth: { sm: 120 },
+              borderRadius: 3
+            }}
+          >
+            ✅ Registrar Pago
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Dialog para pago rápido */}
-      <Dialog open={pagoRapidoOpen} onClose={() => setPagoRapidoOpen(false)}>
-        <DialogTitle>Confirmar Pago Rápido</DialogTitle>
-        <DialogContent>
+      {/* Dialog Pago Rápido Mobile-First */}
+      <Dialog 
+        open={pagoRapidoOpen} 
+        onClose={() => setPagoRapidoOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            borderRadius: 3,
+            m: 2
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          backgroundColor: 'success.main',
+          color: 'white',
+          textAlign: 'center',
+          py: 3
+        }}>
+          ⚡ Pago Rápido
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, textAlign: 'center' }}>
           {alumnoSeleccionado && (
             <>
-              <Typography>
-                {/* Determinar qué tarifa mostrar */}
-                {(() => {
-                  const tarifaRegular = tarifas.find(t => t.nombre === 'regular');
-                  const tarifaNueva = tarifas.find(t => t.nombre === 'nueva');
-                  const monto = alumnoSeleccionado.dias_atraso > 90 
-                    ? (tarifaNueva?.valor || 64000)
-                    : (tarifaRegular?.valor || 58000);
-                  
-                  return (
-                    <>
-                      ¿Registrar pago de <strong>${monto.toLocaleString()}</strong> en efectivo para{' '}
-                      <strong>{alumnoSeleccionado.apellido}, {alumnoSeleccionado.nombre}</strong>?
-                    </>
-                  );
-                })()} 
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                {alumnoSeleccionado.apellido}, {alumnoSeleccionado.nombre}
               </Typography>
-              {alumnoSeleccionado.dias_atraso > 0 && (
-                <Typography color="warning.main" sx={{ mt: 1 }}>
-                  Este alumno tiene {alumnoSeleccionado.dias_atraso} días de atraso.
-                  {alumnoSeleccionado.dias_atraso > 90 && (
-                    <strong> Se aplica tarifa para alumnos nuevos.</strong>
-                  )}
+              
+              <Box sx={{ 
+                backgroundColor: 'success.light', 
+                borderRadius: 2, 
+                p: 2, 
+                mb: 2 
+              }}>
+                <Typography variant="h4" color="success.dark" fontWeight="bold">
+                  {(() => {
+                    const tarifaRegular = tarifas.find(t => t.nombre === 'regular');
+                    const tarifaNueva = tarifas.find(t => t.nombre === 'nueva');
+                    const monto = alumnoSeleccionado.dias_atraso > 90 
+                      ? (tarifaNueva?.valor || 64000)
+                      : (tarifaRegular?.valor || 58000);
+                    return `$${monto.toLocaleString()}`;
+                  })()} 
                 </Typography>
+                <Typography variant="body2" color="success.dark">
+                  💵 Efectivo
+                </Typography>
+              </Box>
+              
+              {alumnoSeleccionado.dias_atraso > 0 && (
+                <Box sx={{ 
+                  backgroundColor: 'warning.light', 
+                  borderRadius: 2, 
+                  p: 2, 
+                  mb: 2 
+                }}>
+                  <Typography color="warning.dark" fontWeight="bold">
+                    ⚠️ {alumnoSeleccionado.dias_atraso} días de atraso
+                  </Typography>
+                  {alumnoSeleccionado.dias_atraso > 90 && (
+                    <Typography variant="body2" color="warning.dark">
+                      Se aplica tarifa para alumnos nuevos
+                    </Typography>
+                  )}
+                </Box>
               )}
             </>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setPagoRapidoOpen(false)}>Cancelar</Button>
-          <Button onClick={confirmarPagoRapido} variant="contained" color="primary">
-            Confirmar Pago
+        <DialogActions sx={{ 
+          p: 3,
+          gap: 2,
+          flexDirection: { xs: 'column', sm: 'row' }
+        }}>
+          <Button 
+            onClick={() => setPagoRapidoOpen(false)}
+            size="large"
+            sx={{ 
+              minHeight: 48,
+              width: { xs: '100%', sm: 'auto' },
+              minWidth: { sm: 120 }
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={confirmarPagoRapido} 
+            variant="contained" 
+            color="success"
+            size="large"
+            sx={{
+              minHeight: 48,
+              width: { xs: '100%', sm: 'auto' },
+              minWidth: { sm: 120 },
+              borderRadius: 3
+            }}
+          >
+            ✅ Confirmar Pago
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Dialog para configuración de tarifas */}
-      <Dialog open={tarifasOpen} onClose={() => setTarifasOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Configurar Tarifas de Mensualidades</DialogTitle>
-        <DialogContent>
-          <Typography variant="subtitle1" sx={{ mb: 2, mt: 1 }}>
-            Configure los valores de las tarifas para los diferentes tipos de alumnos.
+      {/* Dialog Tarifas Mobile-First */}
+      <Dialog 
+        open={tarifasOpen} 
+        onClose={() => setTarifasOpen(false)} 
+fullScreen
+        maxWidth="sm" 
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            margin: { xs: 0, sm: 2 },
+            maxHeight: { xs: '100vh', sm: '90vh' },
+            borderRadius: { xs: 0, sm: 3 }
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          backgroundColor: 'secondary.main',
+          color: 'white',
+          textAlign: 'center',
+          py: { xs: 3, sm: 2 }
+        }}>
+          ⚙️ Configurar Tarifas
+        </DialogTitle>
+        <DialogContent sx={{ p: { xs: 3, sm: 3 } }}>
+          <Typography variant="body1" sx={{ mb: 3, textAlign: 'center', color: 'text.secondary' }}>
+            Ajusta los valores de las mensualidades
           </Typography>
           
-          <TableContainer component={Paper}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Tipo de Tarifa</TableCell>
-                  <TableCell>Descripción</TableCell>
-                  <TableCell>Valor</TableCell>
-                  <TableCell>Acciones</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tarifas.map((tarifa) => (
-                  <TableRow key={tarifa.id}>
-                    <TableCell>{tarifa.nombre === 'regular' ? 'Regular' : 'Nueva'}</TableCell>
-                    <TableCell>{tarifa.descripcion}</TableCell>
-                    <TableCell>
-                      {editandoTarifa?.id === tarifa.id ? (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            {tarifas.map((tarifa) => (
+              <Card key={tarifa.id} sx={{ 
+                borderRadius: 3,
+                boxShadow: 2,
+                border: editandoTarifa?.id === tarifa.id ? '2px solid' : 'none',
+                borderColor: 'primary.main'
+              }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        {tarifa.nombre === 'regular' ? '👥 Tarifa Regular' : '🆕 Tarifa Nueva'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {tarifa.descripcion}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2 }}>
+                    {editandoTarifa?.id === tarifa.id ? (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
                         <TextField
-                          size="small"
                           type="number"
                           value={editandoTarifa.valor}
                           onChange={(e) => setEditandoTarifa({...editandoTarifa, valor: Number(e.target.value)})}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              handleTarifaChange(tarifa.id, editandoTarifa.valor);
-                            }
+                          size="medium"
+                          sx={{ flex: 1 }}
+                          InputProps={{
+                            startAdornment: <Typography sx={{ mr: 1 }}>$</Typography>
                           }}
                           autoFocus
                         />
-                      ) : (
-                        `$${tarifa.valor.toLocaleString()}`
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editandoTarifa?.id === tarifa.id ? (
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                          <Button size="small" onClick={() => handleTarifaChange(tarifa.id, editandoTarifa.valor)}>✓</Button>
-                          <Button size="small" onClick={() => setEditandoTarifa(null)}>✗</Button>
-                        </Box>
-                      ) : (
-                        <Button size="small" onClick={() => setEditandoTarifa({id: tarifa.id, valor: tarifa.valor})}>Editar</Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                        <Button 
+                          variant="contained" 
+                          color="success"
+                          onClick={() => handleTarifaChange(tarifa.id, editandoTarifa.valor)}
+                          sx={{ minHeight: 48, minWidth: 48 }}
+                        >
+                          ✓
+                        </Button>
+                        <Button 
+                          variant="outlined"
+                          onClick={() => setEditandoTarifa(null)}
+                          sx={{ minHeight: 48, minWidth: 48 }}
+                        >
+                          ✗
+                        </Button>
+                      </Box>
+                    ) : (
+                      <>
+                        <Typography variant="h4" color="primary.main" fontWeight="bold">
+                          ${tarifa.valor.toLocaleString()}
+                        </Typography>
+                        <Button 
+                          variant="contained"
+                          onClick={() => setEditandoTarifa({id: tarifa.id, valor: tarifa.valor})}
+                          sx={{ minHeight: 48, minWidth: 100 }}
+                        >
+                          ✏️ Editar
+                        </Button>
+                      </>
+                    )}
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setTarifasOpen(false)}>Cerrar</Button>
+        <DialogActions sx={{ p: { xs: 3, sm: 2 } }}>
+          <Button 
+            onClick={() => setTarifasOpen(false)}
+            variant="contained"
+            size="large"
+            sx={{ 
+              minHeight: 48,
+              width: { xs: '100%', sm: 'auto' },
+              minWidth: { sm: 120 }
+            }}
+          >
+            ✅ Listo
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

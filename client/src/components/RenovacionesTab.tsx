@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 // import AlumnoTableRow from './AlumnoTableRow'; // Removido para evitar error
 import {
-  Box, Typography, TextField, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Paper, Checkbox,
-  Button, Dialog, DialogTitle, DialogContent, DialogActions,
-  Grid, Chip
+  Box, Typography, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions,
+  Grid, Chip, Card, CardContent, Fab, Divider
 } from '@mui/material';
-import { CheckCircle, Cancel, Warning } from '@mui/icons-material';
+import { CheckCircle, Cancel, Warning, Add, Person } from '@mui/icons-material';
 import ToggleSwitch from './ToggleSwitch';
 
 const RenovacionesTab: React.FC = () => {
@@ -128,141 +126,178 @@ const RenovacionesTab: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: { xs: 'column', sm: 'row' },
-        justifyContent: 'space-between', 
-        alignItems: { xs: 'stretch', sm: 'center' }, 
-        mb: 3,
-        gap: 2,
-        p: { xs: 2, sm: 0 }
-      }}>
+      {/* Header Mobile-First */}
+      <Box sx={{ mb: 3, textAlign: 'center' }}>
         <Typography variant="h4" component="h1" sx={{ 
           fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
           fontWeight: 600,
           color: 'primary.main',
-          mb: { xs: 1, sm: 0 }
+          mb: 2
         }}>
-          🔄 Renovaciones Anuales
+          🔄 Renovaciones {selectedAño}
         </Typography>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <TextField
-            label="Año"
-            type="number"
-            value={selectedAño}
-            onChange={(e) => setSelectedAño(Number(e.target.value))}
-            inputProps={{ inputMode: 'numeric' }}
-            sx={{ width: 120 }}
+        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Chip 
+            label="2024" 
+            variant={selectedAño === 2024 ? "filled" : "outlined"}
+            color={selectedAño === 2024 ? "primary" : "default"}
+            onClick={() => setSelectedAño(2024)}
+            sx={{ minHeight: 40 }}
           />
-          <Button variant="outlined" onClick={fetchRenovaciones}>
-            Actualizar
-          </Button>
+          <Chip 
+            label="2025" 
+            variant={selectedAño === 2025 ? "filled" : "outlined"}
+            color={selectedAño === 2025 ? "primary" : "default"}
+            onClick={() => setSelectedAño(2025)}
+            sx={{ minHeight: 40 }}
+          />
+          <Chip 
+            label="2026" 
+            variant={selectedAño === 2026 ? "filled" : "outlined"}
+            color={selectedAño === 2026 ? "primary" : "default"}
+            onClick={() => setSelectedAño(2026)}
+            sx={{ minHeight: 40 }}
+          />
         </Box>
       </Box>
 
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
-          <Box sx={{ p: 2, bgcolor: 'success.light', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h4" color="success.contrastText">
-              {completadas}
-            </Typography>
-            <Typography color="success.contrastText">
-              Renovaciones Completas
-            </Typography>
-          </Box>
+      {/* Dashboard Mobile-First */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={6} sm={4}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            bgcolor: 'success.main',
+            color: 'white',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 3, sm: 2 } }}>
+              <Typography variant="h2" component="div" sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem' },
+                fontWeight: 700,
+                mb: 1
+              }}>
+                {completadas}
+              </Typography>
+              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                ✅ Completas
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={6} sm={4}>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            bgcolor: 'warning.main',
+            color: 'white',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 3, sm: 2 } }}>
+              <Typography variant="h2" component="div" sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem' },
+                fontWeight: 700,
+                mb: 1
+              }}>
+                {renovaciones.length - completadas}
+              </Typography>
+              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                ⚠️ Pendientes
+              </Typography>
+            </CardContent>
+          </Card>
         </Grid>
         <Grid item xs={12} sm={4}>
-          <Box sx={{ p: 2, bgcolor: 'warning.light', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h4" color="warning.contrastText">
-              {renovaciones.length - completadas}
-            </Typography>
-            <Typography color="warning.contrastText">
-              Renovaciones Pendientes
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Box sx={{ p: 2, bgcolor: 'primary.light', borderRadius: 1, textAlign: 'center' }}>
-            <Typography variant="h4" color="primary.contrastText">
-              ${totalRecaudado.toLocaleString()}
-            </Typography>
-            <Typography color="primary.contrastText">
-              Total Recaudado
-            </Typography>
-          </Box>
+          <Card sx={{ 
+            textAlign: 'center',
+            borderRadius: 3,
+            boxShadow: 3,
+            bgcolor: 'primary.main',
+            color: 'white',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 },
+            transition: 'all 0.2s ease'
+          }}>
+            <CardContent sx={{ py: { xs: 3, sm: 2 } }}>
+              <Typography variant="h2" component="div" sx={{ 
+                fontSize: { xs: '1.5rem', sm: '2rem' },
+                fontWeight: 700,
+                mb: 1
+              }}>
+                ${(totalRecaudado / 1000).toFixed(0)}K
+              </Typography>
+              <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                💰 Recaudado
+              </Typography>
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
 
-      <TableContainer component={Paper} sx={{ 
-        overflowX: 'auto',
-        borderRadius: 3,
-        boxShadow: 3,
-        '& .MuiTable-root': {
-          minWidth: { xs: 800, sm: 'auto' },
-          tableLayout: 'fixed',
-          width: '100%'
-        },
-        '& .MuiTableHead-root': {
-          backgroundColor: 'primary.dark',
-          '& .MuiTableCell-head': {
-            color: 'black',
-            fontWeight: 700,
-            fontSize: { xs: '0.8rem', sm: '0.9rem' },
-            textShadow: '1px 1px 2px rgba(255,255,255,0.5)',
-            letterSpacing: '0.5px',
-            position: 'sticky',
-            top: 0,
-            zIndex: 1,
-            backgroundColor: 'primary.dark !important'
-          }
-        },
-        '& .MuiTableCell-head, & .MuiTableCell-body': {
-          padding: '12px 16px !important',
-          textAlign: 'left',
-          verticalAlign: 'middle',
-          borderRight: '1px solid #e0e0e0',
-          wordWrap: 'break-word',
-          overflow: 'hidden'
-        },
-        '& .MuiTableRow-root:nth-of-type(even)': {
-          backgroundColor: 'grey.50'
-        },
-        '& .MuiTableRow-root:hover': {
-          backgroundColor: 'grey.100'
-        }
-      }}>
-        <Table>
-          <colgroup>
-            <col style={{ width: '20%' }} />
-            <col style={{ width: '10%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '16%' }} />
-            <col style={{ width: '15%' }} />
-            <col style={{ width: '15%' }} />
-          </colgroup>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: '#e3f2fd' }}>
-              <TableCell>Alumno</TableCell>
-              <TableCell align="center">Pago</TableCell>
-              <TableCell align="center">Formulario</TableCell>
-              <TableCell align="center">Apto Físico</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Fecha Pago</TableCell>
-              <TableCell>Monto</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {renovaciones.map((renovacion) => {
-              const estado = getEstadoRenovacion(renovacion);
-              return (
-                <TableRow key={renovacion.id}>
-                  <TableCell>
-                    <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {`${renovacion.apellido}, ${renovacion.nombre}`}
+      {/* Cards Mobile-First */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {renovaciones.map((renovacion) => {
+          const estado = getEstadoRenovacion(renovacion);
+          return (
+            <Card 
+              key={renovacion.id}
+              sx={{ 
+                borderRadius: 3,
+                boxShadow: 2,
+                borderLeft: `4px solid ${
+                  estado.color === 'success' ? '#4caf50' :
+                  estado.color === 'warning' ? '#ff9800' : '#f44336'
+                }`,
+                '&:hover': {
+                  boxShadow: 4,
+                  transform: 'translateY(-2px)'
+                },
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <CardContent sx={{ pb: 1 }}>
+                {/* Header con alumno y estado */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Person fontSize="small" color="action" />
+                      <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+                        {renovacion.apellido}, {renovacion.nombre}
+                      </Typography>
+                    </Box>
+                    <Chip
+                      icon={estado.icon}
+                      label={estado.label}
+                      color={estado.color as any}
+                      size="medium"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  </Box>
+                  
+                  {/* Monto si está pagado */}
+                  {renovacion.pago_realizado && (
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Typography variant="h5" color="success.main" fontWeight="bold">
+                        ${renovacion.monto?.toLocaleString()}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {renovacion.fecha_pago ? new Date(renovacion.fecha_pago).toLocaleDateString() : ''}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+
+                <Divider sx={{ mb: 2 }} />
+                
+                {/* Toggles grandes y táctiles */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      💵 Pago Realizado
                     </Typography>
-                  </TableCell>
-                  <TableCell align="center">
                     <ToggleSwitch
                       checked={renovacion.pago_realizado}
                       onChange={(checked) => {
@@ -272,74 +307,110 @@ const RenovacionesTab: React.FC = () => {
                           handleCheckboxChange(renovacion.id, 'pago_realizado', false);
                         }
                       }}
-                      label="Pago"
-                      size="small"
+                      label=""
+                      size="medium"
                       color="success"
                     />
-                  </TableCell>
-                  <TableCell align="center">
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      📋 Formulario Entregado
+                    </Typography>
                     <ToggleSwitch
                       checked={renovacion.formulario_entregado}
                       onChange={(checked) => handleCheckboxChange(renovacion.id, 'formulario_entregado', checked)}
-                      label="Formulario"
-                      size="small"
+                      label=""
+                      size="medium"
                       color="primary"
                     />
-                  </TableCell>
-                  <TableCell align="center">
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      🏅 Apto Físico Entregado
+                    </Typography>
                     <ToggleSwitch
                       checked={renovacion.apto_fisico_entregado}
                       onChange={(checked) => handleCheckboxChange(renovacion.id, 'apto_fisico_entregado', checked)}
-                      label="Apto Físico"
-                      size="small"
+                      label=""
+                      size="medium"
                       color="warning"
                     />
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      icon={estado.icon}
-                      label={estado.label}
-                      color={estado.color as any}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" noWrap>
-                      {renovacion.fecha_pago ? new Date(renovacion.fecha_pago).toLocaleDateString() : '-'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" noWrap>
-                      {renovacion.monto ? `$${renovacion.monto.toLocaleString()}` : '-'}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </Box>
 
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Registrar Pago de Renovación</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Alumno: {selectedAlumno ? `${selectedAlumno.apellido}, ${selectedAlumno.nombre}` : ''}
+      {/* Dialog Mobile-First */}
+      <Dialog 
+        open={open} 
+        onClose={() => setOpen(false)} 
+        fullScreen
+        sx={{
+          '& .MuiDialog-paper': {
+            borderRadius: { xs: 0, sm: 3 }
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          backgroundColor: 'success.main',
+          color: 'white',
+          textAlign: 'center',
+          py: 3
+        }}>
+          💵 Registrar Pago
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, textAlign: 'center' }}>
+          <Typography variant="h6" sx={{ mb: 3 }}>
+            {selectedAlumno ? `${selectedAlumno.apellido}, ${selectedAlumno.nombre}` : ''}
           </Typography>
+          
           <TextField
             fullWidth
             label="Monto de Renovación"
             type="number"
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
-            inputProps={{ inputMode: 'numeric' }}
-            sx={{ mt: 2 }}
+            size="medium"
+            sx={{ mb: 3 }}
+            InputProps={{
+              startAdornment: <Typography sx={{ mr: 1 }}>$</Typography>
+            }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancelar</Button>
-          <Button onClick={handlePagoSubmit} variant="contained">
-            Registrar Pago
+        <DialogActions sx={{ 
+          p: 3,
+          gap: 2,
+          flexDirection: { xs: 'column', sm: 'row' }
+        }}>
+          <Button 
+            onClick={() => setOpen(false)}
+            size="large"
+            sx={{ 
+              minHeight: 48,
+              width: { xs: '100%', sm: 'auto' },
+              minWidth: { sm: 120 }
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handlePagoSubmit} 
+            variant="contained"
+            color="success"
+            size="large"
+            sx={{
+              minHeight: 48,
+              width: { xs: '100%', sm: 'auto' },
+              minWidth: { sm: 120 },
+              borderRadius: 3
+            }}
+          >
+            ✅ Registrar Pago
           </Button>
         </DialogActions>
       </Dialog>

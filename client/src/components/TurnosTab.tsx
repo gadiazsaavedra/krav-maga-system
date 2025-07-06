@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Typography, Grid, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Chip, Button, Dialog,
+  Box, Typography, Grid, Paper, Chip, Button, Dialog,
   DialogTitle, DialogContent, DialogActions, FormControl,
-  InputLabel, Select, MenuItem
+  InputLabel, Select, MenuItem, Card, CardContent, Fab
 } from '@mui/material';
-import { Schedule, Add } from '@mui/icons-material';
+import { Schedule, Add, Person, AccessTime } from '@mui/icons-material';
 
 // Datos estáticos para demostración
 const turnos = [
@@ -107,153 +106,146 @@ const TurnosTab: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" component="h2">
-          <Schedule sx={{ mr: 1, verticalAlign: 'middle' }} />
-          Gestión de Turnos
+      {/* Header Mobile-First */}
+      <Box sx={{ mb: 3, textAlign: 'center' }}>
+        <Typography variant="h4" component="h1" sx={{ 
+          fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+          fontWeight: 600,
+          color: 'primary.main'
+        }}>
+          📅 Turnos
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => setOpenAsignarDialog(true)}
-        >
-          Asignar Alumno
-        </Button>
       </Box>
 
-      <TableContainer component={Paper} sx={{
-        overflowX: 'auto',
-        borderRadius: 3,
-        boxShadow: 3,
-        '& .MuiTable-root': {
-          minWidth: { xs: 700, sm: 'auto' },
-          tableLayout: 'fixed',
-          width: '100%'
-        },
-        '& .MuiTableHead-root': {
-          backgroundColor: '#e3f2fd'
-        },
-        '& .MuiTableCell-head, & .MuiTableCell-body': {
-          padding: '12px 16px !important',
-          textAlign: 'left',
-          verticalAlign: 'middle',
-          borderRight: '1px solid #e0e0e0',
-          wordWrap: 'break-word',
-          overflow: 'hidden'
-        },
-        '& .MuiTableCell-head': {
-          color: 'black',
-          fontWeight: 700,
-          fontSize: { xs: '0.8rem', sm: '0.9rem' },
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          backgroundColor: '#e3f2fd !important'
-        },
-        '& .MuiTableRow-root:nth-of-type(even)': {
-          backgroundColor: 'grey.50'
-        },
-        '& .MuiTableRow-root:hover': {
-          backgroundColor: 'grey.100'
-        }
-      }}>
-        <Table>
-          <colgroup>
-            <col style={{ width: '15%' }} />
-            <col style={{ width: '25%' }} />
-            <col style={{ width: '30%' }} />
-            <col style={{ width: '15%' }} />
-            <col style={{ width: '15%' }} />
-          </colgroup>
-          <TableHead>
-            <TableRow>
-              <TableCell>Día</TableCell>
-              <TableCell>Horario</TableCell>
-              <TableCell>Niveles</TableCell>
-              <TableCell>Alumnos</TableCell>
-              <TableCell align="center">Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {turnosOrdenados.map((turno) => (
-              <TableRow key={turno.id}>
-                <TableCell>
-                  <Typography variant="body2" fontWeight="bold">
-                    {turno.dia}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2">
-                    {`${turno.hora_inicio} - ${turno.hora_fin}`}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {turno.niveles.map((nivel) => (
-                      <Chip
-                        key={nivel}
-                        label={nivel}
-                        size="small"
-                        sx={{
-                          backgroundColor: getCinturonColor(nivel),
-                          color: nivel === 'Blanco' ? 'black' : 'white'
-                        }}
-                      />
-                    ))}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2">
-                    {getAlumnosPorTurno(turno.id).length} alumnos
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => handleVerAlumnos(turno)}
-                  >
-                    Ver Alumnos
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {/* Vista de Calendario Semanal Mobile-First */}
+      <Grid container spacing={1} sx={{ mb: 3 }}>
+        {diasOrden.map((dia) => {
+          const turnosDia = turnosOrdenados.filter(t => t.dia === dia);
+          return (
+            <Grid item xs={12} sm={6} md={2.4} key={dia}>
+              <Paper sx={{ 
+                borderRadius: 3, 
+                boxShadow: 2, 
+                p: 2, 
+                minHeight: 300,
+                bgcolor: 'grey.50'
+              }}>
+                <Typography variant="h6" sx={{ 
+                  textAlign: 'center', 
+                  fontWeight: 600, 
+                  mb: 2,
+                  color: 'primary.main'
+                }}>
+                  {dia.substring(0, 3).toUpperCase()}
+                </Typography>
+                
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {turnosDia.map((turno) => (
+                    <Card 
+                      key={turno.id}
+                      sx={{ 
+                        borderRadius: 2,
+                        boxShadow: 1,
+                        cursor: 'pointer',
+                        '&:hover': {
+                          boxShadow: 3,
+                          transform: 'translateY(-1px)'
+                        },
+                        transition: 'all 0.2s ease'
+                      }}
+                      onClick={() => handleVerAlumnos(turno)}
+                    >
+                      <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
+                        {/* Horario */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                          <AccessTime fontSize="small" color="action" />
+                          <Typography variant="body2" fontWeight="bold">
+                            {turno.hora_inicio}-{turno.hora_fin}
+                          </Typography>
+                        </Box>
+                        
+                        {/* Niveles */}
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
+                          {turno.niveles.map((nivel) => (
+                            <Chip
+                              key={nivel}
+                              label={nivel}
+                              size="small"
+                              sx={{
+                                backgroundColor: getCinturonColor(nivel),
+                                color: nivel === 'Blanco' ? 'black' : 'white',
+                                fontSize: '0.7rem',
+                                height: 20
+                              }}
+                            />
+                          ))}
+                        </Box>
+                        
+                        {/* Alumnos */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Person fontSize="small" color="action" />
+                          <Typography variant="body2" color="text.secondary">
+                            {getAlumnosPorTurno(turno.id).length}
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </Box>
+              </Paper>
+            </Grid>
+          );
+        })}
+      </Grid>
+      
+      {/* FAB */}
+      <Fab
+        color="primary"
+        onClick={() => setOpenAsignarDialog(true)}
+        sx={{
+          position: 'fixed',
+          bottom: { xs: 80, sm: 16 },
+          right: 16,
+          zIndex: 1000
+        }}
+      >
+        <Add />
+      </Fab>
 
       {/* Dialog para ver alumnos de un turno */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md">
         <DialogTitle>
           Alumnos en turno: {selectedTurno?.dia} {selectedTurno?.hora_inicio} - {selectedTurno?.hora_fin}
         </DialogTitle>
-        <DialogContent>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Alumno</TableCell>
-                  <TableCell>Cinturón</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {selectedTurno && getAlumnosPorTurno(selectedTurno.id).map((alumno) => (
-                  <TableRow key={alumno.id}>
-                    <TableCell>{`${alumno.apellido}, ${alumno.nombre}`}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={alumno.cinturon}
-                        sx={{
-                          backgroundColor: getCinturonColor(alumno.cinturon),
-                          color: alumno.cinturon === 'Blanco' ? 'black' : 'white'
-                        }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+        <DialogContent sx={{ p: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {selectedTurno && getAlumnosPorTurno(selectedTurno.id).length === 0 ? (
+              <Typography variant="body1" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
+                😅 No hay alumnos asignados a este turno
+              </Typography>
+            ) : (
+              selectedTurno && getAlumnosPorTurno(selectedTurno.id).map((alumno) => (
+                <Card key={alumno.id} sx={{ borderRadius: 2, boxShadow: 1 }}>
+                  <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Person fontSize="small" color="action" />
+                      <Typography variant="body1" fontWeight={500}>
+                        {`${alumno.apellido}, ${alumno.nombre}`}
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={alumno.cinturon}
+                      sx={{
+                        backgroundColor: getCinturonColor(alumno.cinturon),
+                        color: alumno.cinturon === 'Blanco' ? 'black' : 'white',
+                        fontWeight: 600
+                      }}
+                    />
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cerrar</Button>

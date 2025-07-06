@@ -6,9 +6,9 @@ import {
   Box, Typography, Button, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, Select, MenuItem, FormControl, InputLabel,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, Chip, Grid, Autocomplete, TableSortLabel
+  Paper, Chip, Grid, Autocomplete, Card, CardContent, Fab, Divider
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Add, ShoppingBag, Person } from '@mui/icons-material';
 
 interface Alumno {
   id: number;
@@ -361,212 +361,141 @@ const IndumentariaTab: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: { xs: 'column', sm: 'row' },
-        justifyContent: 'space-between', 
-        alignItems: { xs: 'stretch', sm: 'center' }, 
-        mb: 3,
-        gap: 2,
-        p: { xs: 2, sm: 0 }
-      }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h4" component="h1" sx={{ 
-            fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
-            fontWeight: 600,
-            color: 'primary.main',
-            mb: { xs: 1, sm: 0 }
-          }}>
-            🛍️ Gestión de Indumentaria
-          </Typography>
-          {stockBajo.length > 0 && (
-            <Chip 
-              label={`${stockBajo.length} productos con stock bajo`} 
-              color="error" 
-              size="small"
-            />
-          )}
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            onClick={() => setPreciosOpen(true)}
-          >
-            Gestionar Precios
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => setOpen(true)}
-            size="large"
-            sx={{ 
-              minHeight: { xs: 56, sm: 48 },
-              fontSize: { xs: '1rem', sm: '1rem' },
-              borderRadius: 3,
-              textTransform: 'none',
-              fontWeight: 600,
-              boxShadow: 3,
-              '&:hover': {
-                boxShadow: 6,
-                transform: 'translateY(-1px)'
-              }
-            }}
-          >
-            Nuevo Pedido
-          </Button>
-        </Box>
+      {/* Header Mobile-First */}
+      <Box sx={{ mb: 3, textAlign: 'center' }}>
+        <Typography variant="h4" component="h1" sx={{ 
+          fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+          fontWeight: 600,
+          color: 'primary.main',
+          mb: 1
+        }}>
+          🛍️ Indumentaria
+        </Typography>
+        {stockBajo.length > 0 && (
+          <Chip 
+            label={`⚠️ ${stockBajo.length} productos con stock bajo`} 
+            color="error" 
+            sx={{ mb: 2 }}
+          />
+        )}
       </Box>
 
-      <TableContainer component={Paper} sx={{ 
-        overflowX: 'auto',
-        borderRadius: 3,
-        boxShadow: 3,
-        '& .MuiTable-root': {
-          minWidth: { xs: 800, sm: 'auto' },
-          tableLayout: 'fixed',
-          width: '100%'
-        },
-        '& .MuiTableHead-root': {
-          backgroundColor: 'primary.dark',
-          '& .MuiTableCell-head': {
-            color: 'black',
-            fontWeight: 700,
-            fontSize: { xs: '0.8rem', sm: '0.9rem' },
-            textShadow: '1px 1px 2px rgba(255,255,255,0.5)',
-            letterSpacing: '0.5px',
-            position: 'sticky',
-            top: 0,
-            zIndex: 1,
-            backgroundColor: 'primary.dark !important'
-          }
-        },
-        '& .MuiTableCell-head, & .MuiTableCell-body': {
-          padding: '12px 16px !important',
-          textAlign: 'left',
-          verticalAlign: 'middle',
-          borderRight: '1px solid #e0e0e0',
-          wordWrap: 'break-word',
-          overflow: 'hidden'
-        },
-        '& .MuiTableRow-root:nth-of-type(even)': {
-          backgroundColor: 'grey.50'
-        },
-        '& .MuiTableRow-root:hover': {
-          backgroundColor: 'grey.100'
-        }
-      }}>
-        <Table>
-          <colgroup>
-            <col style={{ width: '18%' }} />
-            <col style={{ width: '15%' }} />
-            <col style={{ width: '8%' }} />
-            <col style={{ width: '8%' }} />
-            <col style={{ width: '10%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '17%' }} />
-          </colgroup>
-          <TableHead>
-            <AlumnoTableRow isHeader>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'alumno'}
-                  direction={orderBy === 'alumno' ? order : 'asc'}
-                  onClick={() => handleRequestSort('alumno')}
-                >
-                  Alumno
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'producto'}
-                  direction={orderBy === 'producto' ? order : 'asc'}
-                  onClick={() => handleRequestSort('producto')}
-                >
-                  Producto
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>Talle</TableCell>
-              <TableCell>Cantidad</TableCell>
-              <TableCell>Monto</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'estado'}
-                  direction={orderBy === 'estado' ? order : 'asc'}
-                  onClick={() => handleRequestSort('estado')}
-                >
-                  Estado
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'fecha_pedido'}
-                  direction={orderBy === 'fecha_pedido' ? order : 'asc'}
-                  onClick={() => handleRequestSort('fecha_pedido')}
-                >
-                  Fecha Pedido
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align="center">Acciones</TableCell>
-            </AlumnoTableRow>
-          </TableHead>
-          <TableBody>
-            {pedidosOrdenados.map((pedido) => (
-              <TableRow key={pedido.id}>
-                <TableCell>
-                  <Typography variant="body2" noWrap sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {`${pedido.apellido}, ${pedido.nombre}`}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
-                    {pedido.tipo}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
-                    {pedido.talle}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
-                    {pedido.cantidad}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
+      {/* Cards Mobile-First */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {pedidosOrdenados.map((pedido) => (
+          <Card 
+            key={pedido.id}
+            sx={{ 
+              borderRadius: 3,
+              boxShadow: 2,
+              borderLeft: `4px solid ${
+                pedido.estado === 'Entregado' ? '#4caf50' :
+                pedido.estado === 'Recibido en Club' ? '#2196f3' : '#ff9800'
+              }`,
+              '&:hover': {
+                boxShadow: 4,
+                transform: 'translateY(-2px)'
+              },
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <CardContent sx={{ pb: 1 }}>
+              {/* Header con alumno y producto */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                <Box sx={{ flex: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Person fontSize="small" color="action" />
+                    <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+                      {pedido.apellido}, {pedido.nombre}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <ShoppingBag fontSize="small" color="action" />
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      {pedido.tipo} - Talle {pedido.talle}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Chip
+                      label={pedido.estado}
+                      color={getEstadoColor(pedido.estado) as any}
+                      size="medium"
+                      sx={{ fontWeight: 600 }}
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      Cant: {pedido.cantidad}
+                    </Typography>
+                  </Box>
+                </Box>
+                
+                {/* Monto prominente */}
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography variant="h5" color="primary.main" fontWeight="bold">
                     ${pedido.monto?.toLocaleString()}
                   </Typography>
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={pedido.estado}
-                    color={getEstadoColor(pedido.estado) as any}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
+                  <Typography variant="body2" color="text.secondary">
                     {new Date(pedido.fecha_pedido).toLocaleDateString()}
                   </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Select
-                    size="small"
-                    value={pedido.estado}
-                    onChange={(e) => handleEstadoChange(pedido.id, e.target.value)}
-                    sx={{ minWidth: 120 }}
-                  >
-                    <MenuItem value="Pedido">Pedido</MenuItem>
-                    <MenuItem value="Recibido en Club">Recibido en Club</MenuItem>
-                    <MenuItem value="Entregado">Entregado</MenuItem>
-                  </Select>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                </Box>
+              </Box>
+
+              <Divider sx={{ mb: 2 }} />
+              
+              {/* Cambio de estado */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ minWidth: 100 }}>
+                  Cambiar estado:
+                </Typography>
+                <Select
+                  size="medium"
+                  value={pedido.estado}
+                  onChange={(e) => handleEstadoChange(pedido.id, e.target.value)}
+                  sx={{ 
+                    flex: 1,
+                    minHeight: 48,
+                    '& .MuiSelect-select': {
+                      py: 1.5
+                    }
+                  }}
+                >
+                  <MenuItem value="Pedido">📝 Pedido</MenuItem>
+                  <MenuItem value="Recibido en Club">🏢 Recibido en Club</MenuItem>
+                  <MenuItem value="Entregado">✅ Entregado</MenuItem>
+                </Select>
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
+      
+      {/* Floating Action Buttons */}
+      <Fab
+        color="primary"
+        onClick={() => setOpen(true)}
+        sx={{
+          position: 'fixed',
+          bottom: { xs: 80, sm: 16 },
+          right: 16,
+          zIndex: 1000
+        }}
+      >
+        <Add />
+      </Fab>
+      
+      {/* FAB Secundario para gestión */}
+      <Fab
+        size="small"
+        color="secondary"
+        onClick={() => setPreciosOpen(true)}
+        sx={{
+          position: 'fixed',
+          bottom: { xs: 140, sm: 76 },
+          right: 16,
+          zIndex: 999
+        }}
+      >
+        ⚙️
+      </Fab>
 
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>Nuevo Pedido de Indumentaria</DialogTitle>
