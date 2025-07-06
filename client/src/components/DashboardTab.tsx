@@ -747,20 +747,95 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
         </CardContent>
       </Card>
       
-      {/* Acceso a más funciones */}
-      <Box sx={{ textAlign: 'center' }}>
-        <Button
-          variant="text"
-          startIcon={<MoreHoriz />}
-          onClick={() => setVerMasOpen(true)}
-          sx={{ 
-            fontSize: '0.9rem',
-            color: 'text.secondary'
-          }}
-        >
-          Más funciones
-        </Button>
-      </Box>
+      {/* Panel de Control Avanzado */}
+      <Card sx={{ 
+        mb: 3, 
+        borderLeft: '6px solid #9c27b0',
+        background: 'linear-gradient(90deg, #f3e5f5, #ffffff)',
+        borderRadius: 3,
+        boxShadow: 3
+      }}>
+        <CardContent sx={{ py: { xs: 3, sm: 3 } }}>
+          <Typography variant="h5" sx={{ 
+            fontWeight: 700, 
+            color: 'secondary.main',
+            mb: 3,
+            textAlign: 'center',
+            fontSize: { xs: '1.3rem', sm: '1.5rem' }
+          }}>
+            🏛️ PANEL DE CONTROL AVANZADO
+          </Typography>
+          
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            <Grid item xs={3}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Person sx={{ fontSize: { xs: '1.8rem', sm: '2rem' }, color: 'primary.main', mb: 0.5 }} />
+                <Typography variant="caption" sx={{ 
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                  fontWeight: 600
+                }}>
+                  Alumnos
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={3}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Assessment sx={{ fontSize: { xs: '1.8rem', sm: '2rem' }, color: 'success.main', mb: 0.5 }} />
+                <Typography variant="caption" sx={{ 
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                  fontWeight: 600
+                }}>
+                  Reportes
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={3}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Store sx={{ fontSize: { xs: '1.8rem', sm: '2rem' }, color: 'warning.main', mb: 0.5 }} />
+                <Typography variant="caption" sx={{ 
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                  fontWeight: 600
+                }}>
+                  Tienda
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={3}>
+              <Box sx={{ textAlign: 'center' }}>
+                <School sx={{ fontSize: { xs: '1.8rem', sm: '2rem' }, color: 'info.main', mb: 0.5 }} />
+                <Typography variant="caption" sx={{ 
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                  fontWeight: 600
+                }}>
+                  Exámenes
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+          
+          <Button
+            variant="contained"
+            color="secondary"
+            size="large"
+            fullWidth
+            onClick={() => setVerMasOpen(true)}
+            sx={{ 
+              py: { xs: 2.5, sm: 2 },
+              fontSize: { xs: '1.1rem', sm: '1rem' },
+              fontWeight: 700,
+              borderRadius: 2,
+              boxShadow: 3,
+              '&:hover': {
+                boxShadow: 6,
+                transform: 'translateY(-1px)',
+                transition: 'all 0.2s ease'
+              }
+            }}
+          >
+            🚀 ACCEDER A TODAS LAS FUNCIONES
+          </Button>
+        </CardContent>
+      </Card>
       
       {/* Modal Nuevo Alumno */}
       <Dialog open={nuevoAlumnoOpen} onClose={() => setNuevoAlumnoOpen(false)} maxWidth="sm" fullWidth>
