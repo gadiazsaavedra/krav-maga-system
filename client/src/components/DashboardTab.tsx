@@ -79,6 +79,10 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
   const [tabReporte, setTabReporte] = useState(0);
   const [periodoReporte, setPeriodoReporte] = useState('mes-actual');
   const [filtroReporte, setFiltroReporte] = useState('todos');
+  const [gestionAlumnosOpen, setGestionAlumnosOpen] = useState(false);
+  const [editarAlumnoOpen, setEditarAlumnoOpen] = useState(false);
+  const [alumnoEditando, setAlumnoEditando] = useState<any>(null);
+  const [busquedaAlumno, setBusquedaAlumno] = useState('');
   const [configMontosOpen, setConfigMontosOpen] = useState(false);
   const [montos, setMontos] = useState({
     renovacionAnual: 15000,
@@ -1020,7 +1024,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
               button 
               onClick={() => {
                 setVerMasOpen(false);
-                setNuevoAlumnoOpen(true);
+                setGestionAlumnosOpen(true);
               }}
               sx={{ 
                 py: { xs: 3, sm: 2 },
@@ -1031,11 +1035,11 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
               }}
             >
               <ListItemIcon sx={{ minWidth: { xs: 56, sm: 40 } }}>
-                <Add color="primary" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
+                <Person color="primary" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Nuevo Alumno" 
-                secondary="Registrar un nuevo estudiante"
+                primary="Gestión de Alumnos" 
+                secondary="Crear, editar, eliminar y administrar alumnos"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
                   fontWeight: 600
@@ -6105,6 +6109,368 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
             }}
           >
             Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
+      {/* Modal Gestión de Alumnos */}
+      <Dialog 
+        open={gestionAlumnosOpen} 
+        onClose={() => setGestionAlumnosOpen(false)} 
+        fullScreen
+        sx={{
+          '& .MuiDialog-paper': {
+            margin: 0,
+            maxHeight: '100vh',
+            borderRadius: 0
+          },
+          '@media (min-width: 600px)': {
+            '& .MuiDialog-paper': {
+              margin: 2,
+              maxHeight: '90vh',
+              borderRadius: 2,
+              maxWidth: 800
+            }
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          backgroundColor: 'primary.main',
+          color: 'white',
+          textAlign: 'center',
+          py: { xs: 2, sm: 3 },
+          fontSize: { xs: '1.2rem', sm: '1.5rem' }
+        }}>
+          🧑‍🎓 Gestión de Alumnos ({alumnos.length})
+        </DialogTitle>
+        <DialogContent sx={{ p: { xs: 2, sm: 3 }, overflow: 'auto' }}>
+          
+          {/* Botón Nuevo Alumno */}
+          <Box sx={{ mb: 3, textAlign: 'center' }}>
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              onClick={() => setNuevoAlumnoOpen(true)}
+              size="large"
+              sx={{ 
+                px: { xs: 4, sm: 3 },
+                py: { xs: 2, sm: 1.5 },
+                fontSize: { xs: '1.1rem', sm: '1rem' },
+                fontWeight: 600,
+                width: { xs: '100%', sm: 'auto' }
+              }}
+            >
+              Nuevo Alumno
+            </Button>
+          </Box>
+          
+          {/* Búsqueda */}
+          <Card sx={{ p: 2, mb: 3, borderRadius: 3 }}>
+            <TextField
+              fullWidth
+              label="Buscar alumno"
+              value={busquedaAlumno}
+              onChange={(e) => setBusquedaAlumno(e.target.value)}
+              placeholder="Nombre o apellido..."
+              sx={{
+                '& .MuiInputBase-input': {
+                  fontSize: { xs: '1.1rem', sm: '1rem' },
+                  py: { xs: 2, sm: 1.5 }
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: { xs: '1.1rem', sm: '1rem' }
+                }
+              }}
+            />
+          </Card>
+          
+          {/* Lista de Alumnos */}
+          {alumnos
+            .filter(alumno => 
+              `${alumno.nombre} ${alumno.apellido}`.toLowerCase().includes(busquedaAlumno.toLowerCase())
+            )
+            .sort((a, b) => `${a.apellido} ${a.nombre}`.localeCompare(`${b.apellido} ${b.nombre}`))
+            .map((alumno) => (
+              <Card key={alumno.id} sx={{ 
+                mb: 2,
+                borderRadius: 3,
+                border: '1px solid',
+                borderColor: 'grey.300'
+              }}>
+                <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'flex-start',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 2, sm: 1 }
+                  }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" sx={{ 
+                        fontWeight: 700,
+                        fontSize: { xs: '1.2rem', sm: '1.25rem' },
+                        mb: 1
+                      }}>
+                        {alumno.apellido}, {alumno.nombre}
+                      </Typography>
+                      
+                      <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, mb: 1 }}>
+                        <Typography variant="body2" sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: 0.5,
+                          fontSize: { xs: '1rem', sm: '0.9rem' }
+                        }}>
+                          📱 {alumno.telefono || 'Sin teléfono'}
+                        </Typography>
+                        
+                        <Chip
+                          label={alumno.cinturon}
+                          size="small"
+                          sx={{
+                            bgcolor: 
+                              alumno.cinturon === 'Blanco' ? '#ffffff' :
+                              alumno.cinturon === 'Amarillo' ? '#ffeb3b' :
+                              alumno.cinturon === 'Naranja' ? '#ff9800' :
+                              alumno.cinturon === 'Verde' ? '#4caf50' :
+                              alumno.cinturon === 'Azul' ? '#2196f3' :
+                              alumno.cinturon === 'Marrón' ? '#795548' : '#000000',
+                            color: 
+                              alumno.cinturon === 'Blanco' ? '#000000' :
+                              alumno.cinturon === 'Amarillo' ? '#000000' : '#ffffff',
+                            border: alumno.cinturon === 'Blanco' ? '1px solid #ccc' : 'none',
+                            fontWeight: 600
+                          }}
+                        />
+                      </Box>
+                      
+                      <Typography variant="caption" color="text.secondary">
+                        ID: {alumno.id} | Registrado: {new Date().toLocaleDateString('es-ES')}
+                      </Typography>
+                    </Box>
+                    
+                    {/* Botones de acción */}
+                    <Box sx={{ 
+                      display: 'flex', 
+                      gap: 1, 
+                      flexDirection: { xs: 'row', sm: 'column' },
+                      width: { xs: '100%', sm: 'auto' }
+                    }}>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        startIcon={<Edit />}
+                        onClick={() => {
+                          setAlumnoEditando(alumno);
+                          setEditarAlumnoOpen(true);
+                        }}
+                        sx={{ 
+                          flex: { xs: 1, sm: 'none' },
+                          fontSize: { xs: '1rem', sm: '0.875rem' },
+                          fontWeight: 600,
+                          py: { xs: 1.5, sm: 1 }
+                        }}
+                      >
+                        Editar
+                      </Button>
+                      
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        startIcon={<Delete />}
+                        onClick={() => {
+                          if (window.confirm(`¿Estás seguro de eliminar a ${alumno.apellido}, ${alumno.nombre}?\n\nEsta acción eliminará también:\n• Sus asistencias\n• Sus notas de progreso\n• Sus mensualidades\n• Sus exámenes\n\n⚠️ Esta acción NO se puede deshacer.`)) {
+                            // Eliminar alumno y datos relacionados
+                            const nuevosAlumnos = alumnos.filter(a => a.id !== alumno.id);
+                            setAlumnos(nuevosAlumnos);
+                            localStorage.setItem('alumnos-krav-maga', JSON.stringify(nuevosAlumnos));
+                            
+                            // Eliminar asistencias
+                            const nuevasAsistencias = todasAsistencias.filter(a => a.alumno_id !== alumno.id);
+                            setTodasAsistencias(nuevasAsistencias);
+                            localStorage.setItem('asistencias-krav-maga', JSON.stringify(nuevasAsistencias));
+                            
+                            // Eliminar notas de progreso
+                            const nuevasNotas = notasProgreso.filter(n => n.alumno_id !== alumno.id);
+                            setNotasProgreso(nuevasNotas);
+                            localStorage.setItem('notas-progreso-krav-maga', JSON.stringify(nuevasNotas));
+                            
+                            // Eliminar mensualidades
+                            const nuevasMensualidades = mensualidades.filter(m => m.alumno !== `${alumno.apellido}, ${alumno.nombre}`);
+                            setMensualidades(nuevasMensualidades);
+                            localStorage.setItem('mensualidades-krav-maga', JSON.stringify(nuevasMensualidades));
+                            
+                            alert(`✅ ${alumno.apellido}, ${alumno.nombre} ha sido eliminado correctamente.`);
+                          }
+                        }}
+                        sx={{ 
+                          flex: { xs: 1, sm: 'none' },
+                          fontSize: { xs: '1rem', sm: '0.875rem' },
+                          fontWeight: 600,
+                          py: { xs: 1.5, sm: 1 }
+                        }}
+                      >
+                        Eliminar
+                      </Button>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))
+          }
+          
+          {/* Sin resultados */}
+          {alumnos.filter(alumno => 
+            `${alumno.nombre} ${alumno.apellido}`.toLowerCase().includes(busquedaAlumno.toLowerCase())
+          ).length === 0 && (
+            <Card sx={{ p: 4, textAlign: 'center', bgcolor: 'grey.50' }}>
+              <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                {busquedaAlumno ? '🔍 No se encontraron alumnos' : '🧑‍🎓 No hay alumnos registrados'}
+              </Typography>
+              {!busquedaAlumno && (
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  Usa "Nuevo Alumno" para agregar el primer estudiante
+                </Typography>
+              )}
+            </Card>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ 
+          p: { xs: 3, sm: 3 },
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'grey.50'
+        }}>
+          <Button 
+            onClick={() => {
+              setGestionAlumnosOpen(false);
+              setBusquedaAlumno('');
+            }} 
+            variant="contained" 
+            size="large"
+            sx={{ 
+              width: '100%',
+              py: { xs: 2, sm: 1.5 },
+              fontSize: { xs: '1.1rem', sm: '1rem' },
+              fontWeight: 600
+            }}
+          >
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
+      {/* Modal Editar Alumno */}
+      <Dialog open={editarAlumnoOpen} onClose={() => setEditarAlumnoOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{
+          backgroundColor: 'primary.main',
+          color: 'white',
+          textAlign: 'center',
+          py: 3
+        }}>
+          ✏️ Editar Alumno
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          {alumnoEditando && (
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Nombre"
+                  value={alumnoEditando.nombre || ''}
+                  onChange={(e) => setAlumnoEditando({...alumnoEditando, nombre: e.target.value})}
+                  size="medium"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Apellido"
+                  value={alumnoEditando.apellido || ''}
+                  onChange={(e) => setAlumnoEditando({...alumnoEditando, apellido: e.target.value})}
+                  size="medium"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Teléfono"
+                  value={alumnoEditando.telefono || ''}
+                  onChange={(e) => setAlumnoEditando({...alumnoEditando, telefono: e.target.value})}
+                  size="medium"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth size="medium">
+                  <InputLabel>Cinturón</InputLabel>
+                  <Select
+                    value={alumnoEditando.cinturon || 'Blanco'}
+                    label="Cinturón"
+                    onChange={(e) => setAlumnoEditando({...alumnoEditando, cinturon: e.target.value})}
+                  >
+                    <MenuItem value="Blanco">🤍 Blanco</MenuItem>
+                    <MenuItem value="Amarillo">🟡 Amarillo</MenuItem>
+                    <MenuItem value="Naranja">🟠 Naranja</MenuItem>
+                    <MenuItem value="Verde">🟢 Verde</MenuItem>
+                    <MenuItem value="Azul">🔵 Azul</MenuItem>
+                    <MenuItem value="Marrón">🟤 Marrón</MenuItem>
+                    <MenuItem value="Negro">⚫ Negro</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 3, gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+          <Button 
+            onClick={() => {
+              setEditarAlumnoOpen(false);
+              setAlumnoEditando(null);
+            }} 
+            size="large" 
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            variant="contained" 
+            size="large" 
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
+            onClick={() => {
+              if (alumnoEditando && alumnoEditando.nombre && alumnoEditando.apellido) {
+                // Actualizar alumno
+                const nuevosAlumnos = alumnos.map(a => 
+                  a.id === alumnoEditando.id ? alumnoEditando : a
+                );
+                setAlumnos(nuevosAlumnos);
+                localStorage.setItem('alumnos-krav-maga', JSON.stringify(nuevosAlumnos));
+                
+                // Actualizar datos relacionados si cambió el nombre
+                const nombreCompleto = `${alumnoEditando.apellido}, ${alumnoEditando.nombre}`;
+                
+                // Actualizar mensualidades
+                const nuevasMensualidades = mensualidades.map(m => 
+                  m.id === alumnoEditando.id ? { ...m, alumno: nombreCompleto } : m
+                );
+                setMensualidades(nuevasMensualidades);
+                localStorage.setItem('mensualidades-krav-maga', JSON.stringify(nuevasMensualidades));
+                
+                // Actualizar notas de progreso
+                const nuevasNotas = notasProgreso.map(n => 
+                  n.alumno_id === alumnoEditando.id ? { ...n, alumno_nombre: nombreCompleto } : n
+                );
+                setNotasProgreso(nuevasNotas);
+                localStorage.setItem('notas-progreso-krav-maga', JSON.stringify(nuevasNotas));
+                
+                setEditarAlumnoOpen(false);
+                setAlumnoEditando(null);
+                alert(`✅ Datos de ${nombreCompleto} actualizados correctamente.`);
+              } else {
+                alert('⚠️ Por favor completa nombre y apellido.');
+              }
+            }}
+          >
+            ✅ Guardar Cambios
           </Button>
         </DialogActions>
       </Dialog>
