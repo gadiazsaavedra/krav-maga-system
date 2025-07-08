@@ -6,7 +6,7 @@ import {
   Checkbox, FormControlLabel, IconButton, Tabs, Tab
 } from '@mui/material';
 import {
-  Add, Phone, MoreHoriz, School, Store, Schedule, Person, Assessment, Inventory, MenuBook, Delete, Edit, Save, Cancel
+  Add, Phone, MoreHoriz, School, Store, Schedule, Person, Assessment, Inventory, MenuBook, Delete, Edit, Save, Cancel, Help
 } from '@mui/icons-material';
 import ToggleSwitch from './ToggleSwitch';
 
@@ -106,6 +106,8 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
   const [morososOpen, setMorososOpen] = useState(false);
   const [busquedaMoroso, setBusquedaMoroso] = useState('');
   const [controlAsistenciasOpen, setControlAsistenciasOpen] = useState(false);
+  const [ayudaOpen, setAyudaOpen] = useState(false);
+  const [ayudaModulo, setAyudaModulo] = useState('');
   const [filtroAsistencia, setFiltroAsistencia] = useState('Todos');
   const [todasAsistencias, setTodasAsistencias] = useState<any[]>([]);
   const [turnosOpen, setTurnosOpen] = useState(false);
@@ -143,6 +145,37 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
     telefono: '',
     cinturon: 'Blanco'
   });
+
+  // Función para sincronizar renovaciones con alumnos
+  const sincronizarRenovaciones = (alumnosActuales: any[]) => {
+    const savedRenovacionesAnuales = localStorage.getItem('renovaciones-anuales-krav-maga');
+    let renovacionesAnualesLocal: any[] = savedRenovacionesAnuales ? JSON.parse(savedRenovacionesAnuales) : [];
+    
+    // Generar renovaciones para todos los alumnos
+    const renovacionesDinamicas = alumnosActuales.map((alumno: any) => {
+      // Buscar si ya existe renovación para este alumno
+      const renovacionExistente = renovacionesAnualesLocal.find((r: any) => 
+        r.alumno === `${alumno.apellido}, ${alumno.nombre}` || r.alumno_id === alumno.id
+      );
+      
+      // Si existe, usar datos existentes, si no, crear nueva
+      return renovacionExistente || {
+        id: alumno.id,
+        alumno_id: alumno.id,
+        alumno: `${alumno.apellido}, ${alumno.nombre}`,
+        ficha: false,
+        certificado: false,
+        fechaCertificado: null,
+        pago: false,
+        montoPago: 15000,
+        fechaPago: null,
+        notas: 'Renovación pendiente'
+      };
+    });
+    
+    setRenovacionesAnuales(renovacionesDinamicas);
+    localStorage.setItem('renovaciones-anuales-krav-maga', JSON.stringify(renovacionesDinamicas));
+  };
 
   useEffect(() => {
     // Cargar datos para dashboard
@@ -297,17 +330,8 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
     
     setTurnoSeleccionado(turnoActual || turnosLocal[0] || null);
     
-    // Cargar renovaciones anuales
-    const savedRenovacionesAnuales = localStorage.getItem('renovaciones-anuales-krav-maga');
-    const renovacionesAnualesLocal = savedRenovacionesAnuales ? JSON.parse(savedRenovacionesAnuales) : [
-      { id: 1, alumno: 'Juan Pérez', ficha: true, certificado: true, fechaCertificado: '2024-01-10', pago: true, montoPago: 15000, fechaPago: '2024-01-15', notas: 'Todo completo' },
-      { id: 2, alumno: 'María González', ficha: true, certificado: false, fechaCertificado: null, pago: false, montoPago: 15000, fechaPago: null, notas: 'Falta certificado y pago' },
-      { id: 3, alumno: 'Pedro López', ficha: false, certificado: false, fechaCertificado: null, pago: true, montoPago: 15000, fechaPago: '2024-01-12', notas: 'Pagó pero falta ficha' }
-    ];
-    setRenovacionesAnuales(renovacionesAnualesLocal);
-    if (!savedRenovacionesAnuales) {
-      localStorage.setItem('renovaciones-anuales-krav-maga', JSON.stringify(renovacionesAnualesLocal));
-    }
+    // Sincronizar renovaciones con alumnos cargados
+    sincronizarRenovaciones(alumnosLocal);
     
     // Cargar exámenes
     const savedExamenes = localStorage.getItem('examenes-krav-maga');
@@ -374,19 +398,31 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
       localStorage.setItem('config-mensualidad-krav-maga', JSON.stringify(configMensualidadLocal));
     }
     
-    // Cargar mensualidades
+    // Cargar mensualidades - generar desde alumnos
     const savedMensualidades = localStorage.getItem('mensualidades-krav-maga');
-    const mensualidadesLocal = savedMensualidades ? JSON.parse(savedMensualidades) : [
-      { id: 1, alumno: 'Juan Pérez', estado: 'Continuo', ultimoPago: '2024-01-15', monto: 25000, pagado: true, fechaPago: '2024-01-15', faltasConsecutivas: 0 },
-      { id: 2, alumno: 'María González', estado: 'Interrumpido', ultimoPago: '2023-11-20', monto: 30000, pagado: false, fechaPago: null, faltasConsecutivas: 2 },
-      { id: 3, alumno: 'Pedro López', estado: 'Continuo', ultimoPago: '2024-01-10', monto: 25000, pagado: true, fechaPago: '2024-01-10', faltasConsecutivas: 0 },
-      { id: 4, alumno: 'Ana Martínez', estado: 'Interrumpido', ultimoPago: '2023-12-05', monto: 30000, pagado: false, fechaPago: null, faltasConsecutivas: 1 },
-      { id: 5, alumno: 'Carlos Ruiz', estado: 'Continuo', ultimoPago: '2024-01-12', monto: 25000, pagado: true, fechaPago: '2024-01-12', faltasConsecutivas: 0 }
-    ];
-    setMensualidades(mensualidadesLocal);
-    if (!savedMensualidades) {
-      localStorage.setItem('mensualidades-krav-maga', JSON.stringify(mensualidadesLocal));
-    }
+    let mensualidadesLocal: any[] = savedMensualidades ? JSON.parse(savedMensualidades) : [];
+    
+    // Generar mensualidades para todos los alumnos
+    const mensualidadesDinamicas = alumnosLocal.map((alumno: any) => {
+      const mensualidadExistente = mensualidadesLocal.find((m: any) => 
+        m.alumno === `${alumno.apellido}, ${alumno.nombre}` || m.alumno_id === alumno.id
+      );
+      
+      return mensualidadExistente || {
+        id: alumno.id,
+        alumno_id: alumno.id,
+        alumno: `${alumno.apellido}, ${alumno.nombre}`,
+        estado: 'Continuo',
+        ultimoPago: null,
+        monto: 25000,
+        pagado: false,
+        fechaPago: null,
+        faltasConsecutivas: 0
+      };
+    });
+    
+    setMensualidades(mensualidadesDinamicas);
+    localStorage.setItem('mensualidades-krav-maga', JSON.stringify(mensualidadesDinamicas));
     
     // Cargar todas las asistencias para análisis
     const savedTodasAsistencias = localStorage.getItem('asistencias-krav-maga');
@@ -405,6 +441,39 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
       localStorage.setItem('asistencias-krav-maga', JSON.stringify(todasAsistenciasLocal));
     }
   }, []);
+
+  // Sincronizar renovaciones y mensualidades cuando cambian los alumnos
+  useEffect(() => {
+    if (alumnos.length > 0) {
+      // Sincronizar renovaciones
+      sincronizarRenovaciones(alumnos);
+      
+      // Sincronizar mensualidades
+      const savedMensualidades = localStorage.getItem('mensualidades-krav-maga');
+      let mensualidadesLocal: any[] = savedMensualidades ? JSON.parse(savedMensualidades) : [];
+      
+      const mensualidadesDinamicas = alumnos.map((alumno: any) => {
+        const mensualidadExistente = mensualidadesLocal.find((m: any) => 
+          m.alumno === `${alumno.apellido}, ${alumno.nombre}` || m.alumno_id === alumno.id
+        );
+        
+        return mensualidadExistente || {
+          id: alumno.id,
+          alumno_id: alumno.id,
+          alumno: `${alumno.apellido}, ${alumno.nombre}`,
+          estado: 'Continuo',
+          ultimoPago: null,
+          monto: 25000,
+          pagado: false,
+          fechaPago: null,
+          faltasConsecutivas: 0
+        };
+      });
+      
+      setMensualidades(mensualidadesDinamicas);
+      localStorage.setItem('mensualidades-krav-maga', JSON.stringify(mensualidadesDinamicas));
+    }
+  }, [alumnos]);
 
   // Estadísticas
   const totalAlumnos = alumnos.length;
@@ -833,6 +902,27 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
             }}
           >
             🚀 ACCEDER A TODAS LAS FUNCIONES
+          </Button>
+          
+          {/* Botón de Ayuda */}
+          <Button
+            variant="outlined"
+            color="info"
+            size="large"
+            startIcon={<Help />}
+            onClick={() => {
+              setAyudaModulo('general');
+              setAyudaOpen(true);
+            }}
+            sx={{ 
+              mt: 2,
+              py: { xs: 1.5, sm: 1 },
+              fontSize: { xs: '1rem', sm: '0.9rem' },
+              fontWeight: 600,
+              width: '100%'
+            }}
+          >
+            ❓ AYUDA Y GUÍA RÁPIDA
           </Button>
         </CardContent>
       </Card>
@@ -3138,15 +3228,15 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
           </Card>
           
           {/* Lista de Renovaciones */}
-          {renovacionesAnuales
-            .filter(r => {
+          {(renovacionesAnuales as any)
+            .filter((r: any) => {
               if (filtroRenovacion === 'Todos') return true;
               if (filtroRenovacion === 'Completo') return r.ficha && r.certificado && r.pago;
               if (filtroRenovacion === 'Pendiente') return !r.ficha || !r.certificado || !r.pago;
               if (filtroRenovacion === 'Sin Pago') return !r.pago;
               return true;
             })
-            .map((renovacion) => (
+            .map((renovacion: any) => (
               <Card key={renovacion.id} sx={{ 
                 mb: 3,
                 borderRadius: 3,
@@ -3169,7 +3259,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                         <Checkbox
                           checked={renovacion.ficha}
                           onChange={(e) => {
-                            const nuevasRenovaciones = renovacionesAnuales.map(r => 
+                            const nuevasRenovaciones = (renovacionesAnuales as any[]).map((r: any) => 
                               r.id === renovacion.id ? { ...r, ficha: e.target.checked } : r
                             );
                             setRenovacionesAnuales(nuevasRenovaciones);
@@ -3187,8 +3277,12 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                         <Checkbox
                           checked={renovacion.certificado}
                           onChange={(e) => {
-                            const nuevasRenovaciones = renovacionesAnuales.map(r => 
-                              r.id === renovacion.id ? { ...r, certificado: e.target.checked, fechaCertificado: e.target.checked ? new Date().toISOString().split('T')[0] : null } : r
+                            const nuevasRenovaciones = (renovacionesAnuales as any[]).map((r: any) => 
+                              r.id === renovacion.id ? { 
+                                ...r, 
+                                certificado: e.target.checked, 
+                                fechaCertificado: e.target.checked ? new Date().toISOString().split('T')[0] : null 
+                              } : r
                             );
                             setRenovacionesAnuales(nuevasRenovaciones);
                             localStorage.setItem('renovaciones-anuales-krav-maga', JSON.stringify(nuevasRenovaciones));
@@ -3212,8 +3306,12 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                         <Checkbox
                           checked={renovacion.pago}
                           onChange={(e) => {
-                            const nuevasRenovaciones = renovacionesAnuales.map(r => 
-                              r.id === renovacion.id ? { ...r, pago: e.target.checked, fechaPago: e.target.checked ? new Date().toISOString().split('T')[0] : null } : r
+                            const nuevasRenovaciones = (renovacionesAnuales as any[]).map((r: any) => 
+                              r.id === renovacion.id ? { 
+                                ...r, 
+                                pago: e.target.checked, 
+                                fechaPago: e.target.checked ? new Date().toISOString().split('T')[0] : null 
+                              } : r
                             );
                             setRenovacionesAnuales(nuevasRenovaciones);
                             localStorage.setItem('renovaciones-anuales-krav-maga', JSON.stringify(nuevasRenovaciones));
@@ -4605,6 +4703,289 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
             }}
           >
             Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
+      {/* Modal de Ayuda */}
+      <Dialog 
+        open={ayudaOpen} 
+        onClose={() => setAyudaOpen(false)} 
+        fullScreen
+        sx={{
+          '& .MuiDialog-paper': {
+            margin: 0,
+            maxHeight: '100vh',
+            borderRadius: 0
+          },
+          '@media (min-width: 600px)': {
+            '& .MuiDialog-paper': {
+              margin: 2,
+              maxHeight: '90vh',
+              borderRadius: 2,
+              maxWidth: 800
+            }
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          backgroundColor: 'info.main',
+          color: 'white',
+          textAlign: 'center',
+          py: { xs: 2, sm: 3 },
+          fontSize: { xs: '1.2rem', sm: '1.5rem' }
+        }}>
+          ❓ Guía Rápida - Sistema Krav Maga
+        </DialogTitle>
+        <DialogContent sx={{ p: { xs: 2, sm: 3 }, overflow: 'auto' }}>
+          
+          {/* Guía General */}
+          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: 3 }}>
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Typography variant="h5" sx={{ 
+                fontWeight: 700,
+                mb: 2,
+                color: 'primary.main',
+                fontSize: { xs: '1.3rem', sm: '1.5rem' }
+              }}>
+                🏠 Panel Principal
+              </Typography>
+              
+              <List>
+                <ListItem sx={{ px: 0 }}>
+                  <ListItemIcon><Person color="primary" /></ListItemIcon>
+                  <ListItemText 
+                    primary="1️⃣ Tomar Asistencia" 
+                    secondary="Botón verde grande → Lista de alumnos del turno → Toggle presente/ausente"
+                  />
+                </ListItem>
+                <ListItem sx={{ px: 0 }}>
+                  <ListItemIcon><MenuBook color="warning" /></ListItemIcon>
+                  <ListItemText 
+                    primary="2️⃣ Última Clase" 
+                    secondary="Ve qué tema se dio la clase anterior → Sugerencia automática de repaso o tema nuevo"
+                  />
+                </ListItem>
+                <ListItem sx={{ px: 0 }}>
+                  <ListItemIcon><School color="success" /></ListItemIcon>
+                  <ListItemText 
+                    primary="3️⃣ Opciones para Hoy" 
+                    secondary="Repaso, Tema Nuevo o consultar Temario completo"
+                  />
+                </ListItem>
+              </List>
+            </CardContent>
+          </Card>
+          
+          {/* Módulos Principales */}
+          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: 3 }}>
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Typography variant="h5" sx={{ 
+                fontWeight: 700,
+                mb: 2,
+                color: 'secondary.main',
+                fontSize: { xs: '1.3rem', sm: '1.5rem' }
+              }}>
+                📊 Módulos Principales
+              </Typography>
+              
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Card sx={{ bgcolor: 'primary.light', color: 'white' }}>
+                    <CardContent sx={{ p: 2 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        💰 Mensualidades
+                      </Typography>
+                      <Typography variant="body2">
+                        • Ver estado de pagos<br/>
+                        • Marcar como pagado<br/>
+                        • Contactar morosos<br/>
+                        • Configurar montos
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <Card sx={{ bgcolor: 'warning.light', color: 'black' }}>
+                    <CardContent sx={{ p: 2 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        📅 Renovaciones
+                      </Typography>
+                      <Typography variant="body2">
+                        • Ficha completada<br/>
+                        • Certificado médico<br/>
+                        • Pago realizado<br/>
+                        • Estados automáticos
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <Card sx={{ bgcolor: 'secondary.light', color: 'white' }}>
+                    <CardContent sx={{ p: 2 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        🛍️ Tienda
+                      </Typography>
+                      <Typography variant="body2">
+                        • Crear pedidos<br/>
+                        • Control de stock<br/>
+                        • Estados: Pedido → Recibido → Entregado<br/>
+                        • Alertas de stock bajo
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <Card sx={{ bgcolor: 'info.light', color: 'black' }}>
+                    <CardContent sx={{ p: 2 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        🥋 Exámenes
+                      </Typography>
+                      <Typography variant="body2">
+                        • Historial completo<br/>
+                        • Próximos exámenes<br/>
+                        • Requisitos: Formulario + Pago<br/>
+                        • Resultados: Aprobado/No aprobado
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+          
+          {/* Consejos Rápidos */}
+          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: 3, bgcolor: 'success.light' }}>
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Typography variant="h5" sx={{ 
+                fontWeight: 700,
+                mb: 2,
+                color: 'success.dark',
+                fontSize: { xs: '1.3rem', sm: '1.5rem' }
+              }}>
+                💡 Consejos Rápidos
+              </Typography>
+              
+              <List>
+                <ListItem sx={{ px: 0 }}>
+                  <ListItemText 
+                    primary="📱 Optimizado para Móvil" 
+                    secondary="Botones grandes, fácil de usar en celular"
+                  />
+                </ListItem>
+                <ListItem sx={{ px: 0 }}>
+                  <ListItemText 
+                    primary="💾 Guardado Automático" 
+                    secondary="Cada cambio se guarda al instante, no perderás datos"
+                  />
+                </ListItem>
+                <ListItem sx={{ px: 0 }}>
+                  <ListItemText 
+                    primary="🔄 Sincronización" 
+                    secondary="Nuevos alumnos aparecen automáticamente en todos los módulos"
+                  />
+                </ListItem>
+                <ListItem sx={{ px: 0 }}>
+                  <ListItemText 
+                    primary="🔍 Filtros" 
+                    secondary="Usa los filtros para encontrar información específica rápidamente"
+                  />
+                </ListItem>
+              </List>
+            </CardContent>
+          </Card>
+          
+          {/* Flujo Diario */}
+          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: 3 }}>
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Typography variant="h5" sx={{ 
+                fontWeight: 700,
+                mb: 2,
+                color: 'primary.main',
+                fontSize: { xs: '1.3rem', sm: '1.5rem' }
+              }}>
+                📅 Rutina Diaria (5 minutos)
+              </Typography>
+              
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Card sx={{ bgcolor: 'grey.100' }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                      🕰️ Antes de la Clase (2 min)
+                    </Typography>
+                    <Typography variant="body2">
+                      1. Seleccionar turno actual<br/>
+                      2. Ver última clase (tema anterior)<br/>
+                      3. Decidir: ¿Repaso o tema nuevo?
+                    </Typography>
+                  </CardContent>
+                </Card>
+                
+                <Card sx={{ bgcolor: 'grey.100' }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                      🏃 Durante la Clase (1 min)
+                    </Typography>
+                    <Typography variant="body2">
+                      1. Botón "Marcar Presentes"<br/>
+                      2. Toggle rápido presente/ausente<br/>
+                      3. Se guarda automáticamente
+                    </Typography>
+                  </CardContent>
+                </Card>
+                
+                <Card sx={{ bgcolor: 'grey.100' }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                      ✅ Después de la Clase (2 min)
+                    </Typography>
+                    <Typography variant="body2">
+                      1. Registrar clase (tema y tipo)<br/>
+                      2. Agregar notas si es necesario<br/>
+                      3. Revisar alertas de morosos
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Box>
+            </CardContent>
+          </Card>
+          
+          {/* Contacto */}
+          <Card sx={{ borderRadius: 3, boxShadow: 3, bgcolor: 'info.light' }}>
+            <CardContent sx={{ p: { xs: 2, sm: 3 }, textAlign: 'center' }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                📞 ¿Necesitas más ayuda?
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Consulta el Manual Completo (PDF) o contacta soporte técnico
+              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                Sistema: https://krav-maga-sys.netlify.app
+              </Typography>
+            </CardContent>
+          </Card>
+        </DialogContent>
+        <DialogActions sx={{ 
+          p: { xs: 3, sm: 3 },
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'grey.50'
+        }}>
+          <Button 
+            onClick={() => setAyudaOpen(false)} 
+            variant="contained" 
+            size="large"
+            sx={{ 
+              width: '100%',
+              py: { xs: 2, sm: 1.5 },
+              fontSize: { xs: '1.1rem', sm: '1rem' },
+              fontWeight: 600
+            }}
+          >
+            Cerrar Ayuda
           </Button>
         </DialogActions>
       </Dialog>
