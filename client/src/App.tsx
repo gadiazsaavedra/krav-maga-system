@@ -85,13 +85,19 @@ function App() {
               variant="h6" 
               component="div" 
               sx={{ 
-                flexGrow: 1,
                 fontSize: { xs: '1rem', sm: '1.25rem' },
                 fontWeight: 'bold'
               }}
             >
               Krav Maga
             </Typography>
+            
+            <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
+              <LicenseCheck>
+                {null}
+              </LicenseCheck>
+            </Box>
+            
             <LanguageSelector 
               currentLanguage={currentLanguage}
               onLanguageChange={setCurrentLanguage}
@@ -100,11 +106,9 @@ function App() {
         </AppBar>
         
         <Container sx={{ mt: 1, px: { xs: 1, sm: 2 }, pb: 2 }}>
-          <LicenseCheck>
-            <Suspense fallback={<LoadingSpinner />}>
-              <DashboardTab onNavigate={handleDashboardNavigate} />
-            </Suspense>
-          </LicenseCheck>
+          <Suspense fallback={<LoadingSpinner />}>
+            <DashboardTab onNavigate={handleDashboardNavigate} t={t} />
+          </Suspense>
         </Container>
         
 

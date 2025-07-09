@@ -12,9 +12,10 @@ import ToggleSwitch from './ToggleSwitch';
 
 interface DashboardTabProps {
   onNavigate: (tabIndex: number, action?: string) => void;
+  t: (key: keyof typeof import('../i18n/translations').translations.es) => string;
 }
 
-const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
+const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
   const [alumnos, setAlumnos] = useState<any[]>([]);
   const [pagos, setPagos] = useState<any[]>([]);
   const [asistenciasHoy, setAsistenciasHoy] = useState<any[]>([]);
@@ -524,7 +525,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
           textAlign: 'center',
           fontSize: { xs: '1.3rem', sm: '1.5rem' }
         }}>
-          🎯 CLASE EN CURSO
+          🎯 {t('classInProgress')}
         </Typography>
         
         <Card sx={{ p: 2, mb: 2, borderRadius: 3, boxShadow: 3 }}>
@@ -629,7 +630,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
               transition: 'all 0.2s ease'
             }}
           >
-            ✅ MARCAR PRESENTES
+            {t('markPresent')}
           </Button>
           
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1, textAlign: 'center' }}>
@@ -901,7 +902,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
               }
             }}
           >
-            🚀 ACCEDER A TODAS LAS FUNCIONES
+            {t('accessAllFunctions')}
           </Button>
           
           {/* Botón de Ayuda */}
@@ -922,7 +923,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
               width: '100%'
             }}
           >
-            ❓ AYUDA Y GUÍA RÁPIDA
+            {t('helpGuide')}
           </Button>
         </CardContent>
       </Card>
@@ -988,7 +989,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
         </DialogContent>
         <DialogActions sx={{ p: 3, gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
           <Button onClick={() => setNuevoAlumnoOpen(false)} size="large" sx={{ width: { xs: '100%', sm: 'auto' } }}>
-            Cancelar
+            {t('cancel')}
           </Button>
           <Button 
             variant="contained" 
@@ -1005,7 +1006,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
               setNuevoAlumnoOpen(false);
             }}
           >
-            ✅ Crear Alumno
+            ✅ {t('create')} Alumno
           </Button>
         </DialogActions>
       </Dialog>
@@ -1085,7 +1086,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
             size="large" 
             sx={{ width: '100%' }}
           >
-            ✅ Listo
+            ✅ {t('close')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1203,7 +1204,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <Person color="primary" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Gestión de Alumnos" 
+                primary={t('studentManagement')} 
                 secondary="Crear, editar, eliminar y administrar alumnos"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
@@ -1233,7 +1234,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <Store color="secondary" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Pedidos de Indumentaria" 
+                primary={t('store')} 
                 secondary="Gestionar pedidos de ropa y equipos"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
@@ -1293,7 +1294,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <MenuBook color="secondary" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Temario de Clases" 
+                primary={t('syllabusClasses')} 
                 secondary="Planificar y consultar temas por cinturón"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
@@ -1323,7 +1324,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <Assessment color="warning" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Renovaciones Anuales" 
+                primary={t('annualRenewals')} 
                 secondary="Gestionar fichas, certificados y pagos"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
@@ -1353,7 +1354,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <School color="info" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Exámenes de Cinturón" 
+                primary={t('exams')} 
                 secondary="Gestionar formularios, pagos y resultados"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
@@ -1383,7 +1384,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <Schedule color="success" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Turnos y Horarios" 
+                primary={t('schedules')} 
                 secondary="Ver y modificar horarios de clases"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
@@ -1413,7 +1414,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <Person color="warning" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Herramientas del Instructor" 
+                primary={t('instructorTools')} 
                 secondary="Cronómetro, notas, estadísticas y más"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
@@ -1443,7 +1444,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <Assessment color="primary" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Mensualidades" 
+                primary={t('monthlyPayments')} 
                 secondary="Control de pagos mensuales"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
@@ -1473,7 +1474,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <Assessment color="info" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Control de Asistencias" 
+                primary={t('attendanceControl')} 
                 secondary="Historial e inasistencias por alumno"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
@@ -1503,7 +1504,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <Assessment color="success" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Configurar Montos" 
+                primary={t('configureAmounts')} 
                 secondary="Renovaciones y exámenes"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
@@ -1531,7 +1532,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <Assessment color="info" sx={{ fontSize: { xs: '2rem', sm: '1.5rem' } }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Reportes Personalizables" 
+                primary={t('reports')} 
                 secondary="Dashboard interactivo con exportación"
                 primaryTypographyProps={{
                   fontSize: { xs: '1.1rem', sm: '1rem' },
@@ -1605,7 +1606,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                           Pedido: {pedido.fecha}
                         </Typography>
                         <Chip
-                          label={pedido.pagado ? 'Pagado' : 'Sin Pagar'}
+                          label={pedido.pagado ? t('paid') : t('pending')}
                           color={pedido.pagado ? 'success' : 'error'}
                           size="small"
                           sx={{ fontSize: '0.7rem' }}
@@ -1635,7 +1636,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                               localStorage.setItem('pedidos-krav-maga', JSON.stringify(nuevosPedidos));
                             }}
                           >
-                            Marcar Pagado
+                            {t('markPaid')}
                           </Button>
                         )}
                         {pedido.estado !== 'Entregado' && (
@@ -3347,7 +3348,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                   {/* Estado General */}
                   <Box sx={{ mt: 2, textAlign: 'center' }}>
                     <Chip
-                      label={(renovacion.ficha && renovacion.certificado && renovacion.pago) ? 'COMPLETO' : 'PENDIENTE'}
+                      label={(renovacion.ficha && renovacion.certificado && renovacion.pago) ? t('complete') : t('pending')}
                       color={(renovacion.ficha && renovacion.certificado && renovacion.pago) ? 'success' : 'warning'}
                       sx={{ fontWeight: 700, fontSize: '0.9rem' }}
                     />
@@ -4117,7 +4118,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                           sx={{ fontWeight: 600 }}
                         />
                         <Chip
-                          label={mensualidad.pagado ? 'PAGADO' : 'PENDIENTE'}
+                          label={mensualidad.pagado ? t('paid') : t('pending')}
                           color={mensualidad.pagado ? 'success' : 'error'}
                           size="small"
                           sx={{ fontWeight: 600 }}
@@ -4181,7 +4182,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                       }}
                       sx={{ flex: 1 }}
                     >
-                      {mensualidad.pagado ? 'Marcar Impago' : 'Marcar Pagado'}
+                      {mensualidad.pagado ? 'Marcar Impago' : t('markPaid')}
                     </Button>
                     
                     <Button
@@ -4756,21 +4757,21 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                   <ListItemIcon><Person color="primary" /></ListItemIcon>
                   <ListItemText 
                     primary="1️⃣ Tomar Asistencia" 
-                    secondary="Botón verde grande → Lista de alumnos del turno → Toggle presente/ausente"
+                    secondary={t('helpTakeAttendance')}
                   />
                 </ListItem>
                 <ListItem sx={{ px: 0 }}>
                   <ListItemIcon><MenuBook color="warning" /></ListItemIcon>
                   <ListItemText 
                     primary="2️⃣ Última Clase" 
-                    secondary="Ve qué tema se dio la clase anterior → Sugerencia automática de repaso o tema nuevo"
+                    secondary={t('helpLastClass')}
                   />
                 </ListItem>
                 <ListItem sx={{ px: 0 }}>
                   <ListItemIcon><School color="success" /></ListItemIcon>
                   <ListItemText 
                     primary="3️⃣ Opciones para Hoy" 
-                    secondary="Repaso, Tema Nuevo o consultar Temario completo"
+                    secondary={t('helpTodayOptions')}
                   />
                 </ListItem>
               </List>
@@ -4873,19 +4874,19 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate }) => {
                 <ListItem sx={{ px: 0 }}>
                   <ListItemText 
                     primary="📱 Optimizado para Móvil" 
-                    secondary="Botones grandes, fácil de usar en celular"
+                    secondary={t('helpMobileOptimized')}
                   />
                 </ListItem>
                 <ListItem sx={{ px: 0 }}>
                   <ListItemText 
                     primary="💾 Guardado Automático" 
-                    secondary="Cada cambio se guarda al instante, no perderás datos"
+                    secondary={t('helpAutoSave')}
                   />
                 </ListItem>
                 <ListItem sx={{ px: 0 }}>
                   <ListItemText 
                     primary="🔄 Sincronización" 
-                    secondary="Nuevos alumnos aparecen automáticamente en todos los módulos"
+                    secondary={t('helpSync')}
                   />
                 </ListItem>
                 <ListItem sx={{ px: 0 }}>

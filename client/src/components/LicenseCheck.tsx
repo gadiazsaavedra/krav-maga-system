@@ -163,24 +163,16 @@ const LicenseCheck: React.FC<LicenseCheckProps> = ({ children }) => {
   return (
     <>
       {!demoExpired && (
-        <Box sx={{ 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          right: 0, 
-          zIndex: 9999,
-          bgcolor: 'warning.main',
-          color: 'white',
-          p: 1,
-          textAlign: 'center'
+        <Typography variant="caption" sx={{ 
+          fontWeight: 600,
+          color: 'warning.light',
+          fontSize: { xs: '0.7rem', sm: '0.75rem' }
         }}>
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            🔓 MODO DEMO - {demoInfo.daysLeft} días restantes
-          </Typography>
-        </Box>
+          🔓 DEMO - {demoInfo.daysLeft}d
+        </Typography>
       )}
       
-      <Box sx={{ pt: demoExpired ? 0 : 6 }}>
+      <Box>
         {!demoExpired ? children : null}
       </Box>
 
