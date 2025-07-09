@@ -247,10 +247,10 @@ const LicenseCheck: React.FC<LicenseCheckProps> = ({ children }) => {
               💡 Suscripción Mensual:
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              • $XX.XXX/mes por club<br/>
+              • $50.000/mes por instructor<br/>
               • Licencia válida por 30 días<br/>
               • Soporte técnico incluido<br/>
-              • Contacto: [tu-email@ejemplo.com]
+              • Contacto: gadiazsaavedra@gmail.com
             </Typography>
           </Box>
         </DialogContent>
