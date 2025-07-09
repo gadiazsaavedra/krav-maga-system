@@ -7,6 +7,8 @@ import { CssBaseline, AppBar, Toolbar, Typography, Container, Box } from '@mui/m
 // React Query removido - no se usa
 import { AppProvider } from './context/AppContext';
 import LicenseCheck from './components/LicenseCheck';
+import LanguageSelector from './components/LanguageSelector';
+import { translations, Language } from './i18n/translations';
 
 import { lazy, Suspense } from 'react';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -63,6 +65,11 @@ const theme = createTheme({
 
 function App() {
   const [dashboardAction, setDashboardAction] = useState<string | null>(null);
+  const [currentLanguage, setCurrentLanguage] = useState<Language>('es');
+  
+  const t = (key: keyof typeof translations.es) => {
+    return translations[currentLanguage][key] || translations.es[key];
+  };
 
   const handleDashboardNavigate = (tabIndex: number, action?: string) => {
     setDashboardAction(action || null);
@@ -85,6 +92,10 @@ function App() {
             >
               Krav Maga
             </Typography>
+            <LanguageSelector 
+              currentLanguage={currentLanguage}
+              onLanguageChange={setCurrentLanguage}
+            />
           </Toolbar>
         </AppBar>
         

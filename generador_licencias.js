@@ -29,11 +29,11 @@ const clientes = [
   { nombre: 'GYM3', descripcion: 'Gimnasio Krav Maga Sur' }
 ];
 
-const año = 2024;
+const año = 2025;
 const meses = [
-  { num: 1, nombre: 'Enero' },
-  { num: 2, nombre: 'Febrero' },
-  { num: 3, nombre: 'Marzo' }
+  { num: 7, nombre: 'Julio' },
+  { num: 8, nombre: 'Agosto' },
+  { num: 9, nombre: 'Septiembre' }
 ];
 
 clientes.forEach(cliente => {
@@ -62,8 +62,8 @@ function generarLicenciaCliente(nombreCliente, año, mes) {
   return licencia;
 }
 
-// Ejemplo: Generar licencia para enero 2024
-// generarLicenciaCliente('MICLUB', 2024, 1);
+// Ejemplo: Generar licencia para julio 2025
+// generarLicenciaCliente('MICLUB', 2025, 7);
 
 console.log('💡 Para generar una licencia específica:');
-console.log('generarLicenciaCliente("NOMBRE_CLIENTE", 2024, 1);');
+console.log('generarLicenciaCliente("NOMBRE_CLIENTE", 2025, 7);');
