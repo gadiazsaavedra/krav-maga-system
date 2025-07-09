@@ -612,7 +612,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
             alignItems: 'center',
             gap: 1
           }}>
-            1️⃣ TOMAR ASISTENCIA
+            1️⃣ {t('takeAttendance')}
           </Typography>
           
           <Button
@@ -650,7 +650,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
             alignItems: 'center',
             gap: 1
           }}>
-            2️⃣ ÚLTIMA CLASE RECORDATORIO
+            2️⃣ {t('lastClassReminder')}
           </Typography>
           
           {(() => {
@@ -751,7 +751,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
             alignItems: 'center',
             gap: 1
           }}>
-            3️⃣ OPCIONES PARA HOY
+            3️⃣ {t('todayOptions')}
           </Typography>
           
           <Grid container spacing={2}>
@@ -773,7 +773,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
                   borderRadius: 2
                 }}
               >
-                🔄 Repaso
+                {t('review')}
               </Button>
             </Grid>
             <Grid item xs={12} sm={4}>
@@ -794,7 +794,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
                   borderRadius: 2
                 }}
               >
-                🆕 Tema Nuevo
+                {t('newTopic')}
               </Button>
             </Grid>
             <Grid item xs={12} sm={4}>
@@ -810,7 +810,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
                   borderRadius: 2
                 }}
               >
-                📚 Temario
+                {t('syllabus')}
               </Button>
             </Grid>
           </Grid>
@@ -936,7 +936,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
           textAlign: 'center',
           py: 3
         }}>
-          ➕ Nuevo Alumno
+          ➕ {t('newStudent')}
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
           <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -1019,7 +1019,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
           textAlign: 'center',
           py: 3
         }}>
-          ✅ Tomar Asistencia
+          ✅ {t('takeAttendance')}
         </DialogTitle>
         <DialogContent sx={{ p: 2 }}>
           <Typography variant="body1" sx={{ mb: 2, textAlign: 'center' }}>
@@ -1575,7 +1575,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
           textAlign: 'center',
           py: 3
         }}>
-          🛍️ Pedidos de Indumentaria
+          🛍️ {t('store')}
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
           <Box sx={{ mb: 2, textAlign: 'right' }}>
@@ -1585,7 +1585,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
               onClick={() => setNuevoPedidoOpen(true)}
               sx={{ mb: 2 }}
             >
-              Nuevo Pedido
+              {t('newOrder')}
             </Button>
           </Box>
           
@@ -1706,7 +1706,7 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
           textAlign: 'center',
           py: 3
         }}>
-          🛍️ Nuevo Pedido
+          🛍️ {t('newOrder')}
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
           <Grid container spacing={2} sx={{ mt: 1 }}>
