@@ -6,7 +6,7 @@ import { CssBaseline, AppBar, Toolbar, Typography, Container, Box } from '@mui/m
 // import 'dayjs/locale/es';
 // React Query removido - no se usa
 import { AppProvider } from './context/AppContext';
-
+import LicenseCheck from './components/LicenseCheck';
 
 import { lazy, Suspense } from 'react';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -89,10 +89,11 @@ function App() {
         </AppBar>
         
         <Container sx={{ mt: 1, px: { xs: 1, sm: 2 }, pb: 2 }}>
-          
-          <Suspense fallback={<LoadingSpinner />}>
-            <DashboardTab onNavigate={handleDashboardNavigate} />
-          </Suspense>
+          <LicenseCheck>
+            <Suspense fallback={<LoadingSpinner />}>
+              <DashboardTab onNavigate={handleDashboardNavigate} />
+            </Suspense>
+          </LicenseCheck>
         </Container>
         
 
