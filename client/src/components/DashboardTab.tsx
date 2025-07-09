@@ -621,11 +621,12 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
             onClick={() => setAsistenciaOpen(true)}
             sx={{
               width: '100%',
-              py: 3,
-              fontSize: { xs: '1.2rem', sm: '1.4rem' },
+              py: { xs: 4, sm: 3 },
+              fontSize: { xs: '1.4rem', sm: '1.2rem' },
               fontWeight: 700,
-              borderRadius: 3,
+              borderRadius: 4,
               boxShadow: 4,
+              minHeight: { xs: 64, sm: 56 },
               '&:hover': { boxShadow: 6, transform: 'translateY(-2px)' },
               transition: 'all 0.2s ease'
             }}
@@ -754,66 +755,70 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
             3️⃣ {t('todayOptions')}
           </Typography>
           
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <Button
-                variant="contained"
-                color="success"
-                size="large"
-                onClick={() => {
-                  const cinturonPrincipal = turnoSeleccionado?.cinturones[0] || 'Blanco';
-                  setNuevaClase({...nuevaClase, tipo: 'Repaso', cinturon: cinturonPrincipal});
-                  setNuevaClaseOpen(true);
-                }}
-                sx={{
-                  width: '100%',
-                  py: 2,
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  borderRadius: 2
-                }}
-              >
-                {t('review')}
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                onClick={() => {
-                  const cinturonPrincipal = turnoSeleccionado?.cinturones[0] || 'Blanco';
-                  setNuevaClase({...nuevaClase, tipo: 'Nuevo', cinturon: cinturonPrincipal});
-                  setNuevaClaseOpen(true);
-                }}
-                sx={{
-                  width: '100%',
-                  py: 2,
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  borderRadius: 2
-                }}
-              >
-                {t('newTopic')}
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Button
-                variant="outlined"
-                size="large"
-                onClick={() => setTemarioOpen(true)}
-                sx={{
-                  width: '100%',
-                  py: 2,
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  borderRadius: 2
-                }}
-              >
-                {t('syllabus')}
-              </Button>
-            </Grid>
-          </Grid>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 2, sm: 2 }
+          }}>
+            <Button
+              variant="contained"
+              color="success"
+              size="large"
+              onClick={() => {
+                const cinturonPrincipal = turnoSeleccionado?.cinturones[0] || 'Blanco';
+                setNuevaClase({...nuevaClase, tipo: 'Repaso', cinturon: cinturonPrincipal});
+                setNuevaClaseOpen(true);
+              }}
+              sx={{
+                flex: { xs: 'none', sm: 1 },
+                width: { xs: '100%', sm: 'auto' },
+                py: { xs: 3, sm: 2 },
+                fontSize: { xs: '1.2rem', sm: '1rem' },
+                fontWeight: 600,
+                borderRadius: 3,
+                minHeight: { xs: 56, sm: 48 }
+              }}
+            >
+              {t('review')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={() => {
+                const cinturonPrincipal = turnoSeleccionado?.cinturones[0] || 'Blanco';
+                setNuevaClase({...nuevaClase, tipo: 'Nuevo', cinturon: cinturonPrincipal});
+                setNuevaClaseOpen(true);
+              }}
+              sx={{
+                flex: { xs: 'none', sm: 1 },
+                width: { xs: '100%', sm: 'auto' },
+                py: { xs: 3, sm: 2 },
+                fontSize: { xs: '1.2rem', sm: '1rem' },
+                fontWeight: 600,
+                borderRadius: 3,
+                minHeight: { xs: 56, sm: 48 }
+              }}
+            >
+              {t('newTopic')}
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={() => setTemarioOpen(true)}
+              sx={{
+                flex: { xs: 'none', sm: 1 },
+                width: { xs: '100%', sm: 'auto' },
+                py: { xs: 3, sm: 2 },
+                fontSize: { xs: '1.2rem', sm: '1rem' },
+                fontWeight: 600,
+                borderRadius: 3,
+                minHeight: { xs: 56, sm: 48 }
+              }}
+            >
+              {t('syllabus')}
+            </Button>
+          </Box>
         </CardContent>
       </Card>
       
@@ -836,52 +841,53 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
             🏛️ PANEL DE CONTROL AVANZADO
           </Typography>
           
-          <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid item xs={3}>
-              <Box sx={{ textAlign: 'center' }}>
-                <Person sx={{ fontSize: { xs: '1.8rem', sm: '2rem' }, color: 'primary.main', mb: 0.5 }} />
-                <Typography variant="caption" sx={{ 
-                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                  fontWeight: 600
-                }}>
-                  Alumnos
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={3}>
-              <Box sx={{ textAlign: 'center' }}>
-                <Assessment sx={{ fontSize: { xs: '1.8rem', sm: '2rem' }, color: 'success.main', mb: 0.5 }} />
-                <Typography variant="caption" sx={{ 
-                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                  fontWeight: 600
-                }}>
-                  Reportes
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={3}>
-              <Box sx={{ textAlign: 'center' }}>
-                <Store sx={{ fontSize: { xs: '1.8rem', sm: '2rem' }, color: 'warning.main', mb: 0.5 }} />
-                <Typography variant="caption" sx={{ 
-                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                  fontWeight: 600
-                }}>
-                  Tienda
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={3}>
-              <Box sx={{ textAlign: 'center' }}>
-                <School sx={{ fontSize: { xs: '1.8rem', sm: '2rem' }, color: 'info.main', mb: 0.5 }} />
-                <Typography variant="caption" sx={{ 
-                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                  fontWeight: 600
-                }}>
-                  Exámenes
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
+          <Box sx={{ 
+            display: 'flex',
+            justifyContent: 'space-around',
+            mb: 3,
+            px: 1
+          }}>
+            <Box sx={{ textAlign: 'center', flex: 1 }}>
+              <Person sx={{ fontSize: { xs: '2.2rem', sm: '1.8rem' }, color: 'primary.main', mb: 1 }} />
+              <Typography variant="caption" sx={{ 
+                fontSize: { xs: '0.8rem', sm: '0.7rem' },
+                fontWeight: 600,
+                display: 'block'
+              }}>
+                Alumnos
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'center', flex: 1 }}>
+              <Assessment sx={{ fontSize: { xs: '2.2rem', sm: '1.8rem' }, color: 'success.main', mb: 1 }} />
+              <Typography variant="caption" sx={{ 
+                fontSize: { xs: '0.8rem', sm: '0.7rem' },
+                fontWeight: 600,
+                display: 'block'
+              }}>
+                Reportes
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'center', flex: 1 }}>
+              <Store sx={{ fontSize: { xs: '2.2rem', sm: '1.8rem' }, color: 'warning.main', mb: 1 }} />
+              <Typography variant="caption" sx={{ 
+                fontSize: { xs: '0.8rem', sm: '0.7rem' },
+                fontWeight: 600,
+                display: 'block'
+              }}>
+                Tienda
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'center', flex: 1 }}>
+              <School sx={{ fontSize: { xs: '2.2rem', sm: '1.8rem' }, color: 'info.main', mb: 1 }} />
+              <Typography variant="caption" sx={{ 
+                fontSize: { xs: '0.8rem', sm: '0.7rem' },
+                fontWeight: 600,
+                display: 'block'
+              }}>
+                Exámenes
+              </Typography>
+            </Box>
+          </Box>
           
           <Button
             variant="contained"
@@ -890,11 +896,12 @@ const DashboardTab: React.FC<DashboardTabProps> = ({ onNavigate, t }) => {
             fullWidth
             onClick={() => setVerMasOpen(true)}
             sx={{ 
-              py: { xs: 2.5, sm: 2 },
-              fontSize: { xs: '1.1rem', sm: '1rem' },
+              py: { xs: 3.5, sm: 2 },
+              fontSize: { xs: '1.3rem', sm: '1rem' },
               fontWeight: 700,
-              borderRadius: 2,
-              boxShadow: 3,
+              borderRadius: 3,
+              boxShadow: 4,
+              minHeight: { xs: 60, sm: 48 },
               '&:hover': {
                 boxShadow: 6,
                 transform: 'translateY(-1px)',
